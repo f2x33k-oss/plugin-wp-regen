@@ -181,18 +181,30 @@ class AICFP_Queue_Manager {
             $generated_content = maybe_unserialize($task->generated_content);
             $generated_images = maybe_unserialize($task->generated_images);
             
-            $post_content = self::build_post_content($generated_content, $generated_images);
+            // Générer une intro de 30 mots
+            $intro = self::generate_intro($task->title);
+            
+            // Construire le contenu avec intro + recettes
+            $post_content = self::build_post_content_with_intro($intro, $generated_content, $generated_images);
+            
+            // Déterminer le statut de publication (depuis les options de la tâche)
+            $publish_article = get_post_meta($task->id, '_aicfp_publish_article', true);
+            $post_status = $publish_article ? 'publish' : 'draft';
             
             $post_data = array(
                 'post_title' => $task->title,
                 'post_content' => $post_content,
-                'post_status' => 'draft',
+                'post_status' => $post_status,
                 'post_type' => 'post'
             );
             
             $post_id = wp_insert_post($post_data);
             
-            if (!is_wp_error($post_id)) {
+            if (!is_wp_error($post_id) && !empty($generated_images)) {
+                // Définir la première image comme image à la une
+                $first_image_url = $generated_images[0]['url'];
+                self::set_featured_image_from_url($post_id, $first_image_url);
+                
                 // Associer les métadonnées
                 update_post_meta($post_id, '_aicfp_task_id', $task->id);
                 update_post_meta($post_id, '_aicfp_generated_images', $generated_images);
@@ -268,7 +280,145 @@ class AICFP_Queue_Manager {
     }
     
     /**
-     * Construire le contenu de l'article
+     * Générer une intro de 30 mots via ChatGPT
+     */
+    private static function generate_intro($title) {
+        $api_key = get_option('aicfp_openai_api_key');
+        
+        if (empty($api_key)) {
+            return "Découvrez notre sélection exceptionnelle de recettes délicieuses et faciles à réaliser pour régaler toute la famille.";
+        }
+        
+        $prompt = "Écris une introduction accrocheuse de EXACTEMENT 30 mots pour un article intitulé : \"$title\". L'intro doit donner envie de lire les recettes. Réponds UNIQUEMENT avec l'introduction, sans guillemets.";
+        
+        $response = wp_remote_post('https://api.openai.com/v1/chat/completions', array(
+            'timeout' => 30,
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer ' . $api_key
+            ),
+            'body' => wp_json_encode(array(
+                'model' => 'gpt-4o',
+                'messages' => array(
+                    array(
+                        'role' => 'user',
+                        'content' => $prompt
+                    )
+                ),
+                'max_tokens' => 100,
+                'temperature' => 0.7
+            ))
+        ));
+        
+        if (is_wp_error($response)) {
+            return "Découvrez notre sélection exceptionnelle de recettes délicieuses et faciles à réaliser pour régaler toute la famille.";
+        }
+        
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+        
+        if (isset($data['choices'][0]['message']['content'])) {
+            return trim($data['choices'][0]['message']['content']);
+        }
+        
+        return "Découvrez notre sélection exceptionnelle de recettes délicieuses et faciles à réaliser pour régaler toute la famille.";
+    }
+    
+    /**
+     * Construire le contenu de l'article avec intro
+     */
+    private static function build_post_content_with_intro($intro, $generated_content, $generated_images) {
+        // Intro de 30 mots
+        $content = '<p class="intro-paragraph"><strong>' . $intro . '</strong></p>';
+        $content .= "\n\n";
+        
+        if (is_array($generated_content) && is_array($generated_images)) {
+            foreach ($generated_content as $index => $item) {
+                // Extraire le titre de la recette du contenu
+                $recipe_text = $item['content'];
+                $lines = explode("\n", $recipe_text);
+                $recipe_title = '';
+                
+                // Chercher le titre dans les premières lignes (souvent avec emoji 🍽️ ou en gras)
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (!empty($line) && !str_starts_with($line, '👥') && !str_starts_with($line, '⏱️')) {
+                        // Nettoyer le titre des émoticones en début de ligne
+                        $recipe_title = preg_replace('/^[^\w\s]+\s*/', '', $line);
+                        $recipe_title = trim(str_replace(['**', '__'], '', $recipe_title));
+                        if (!empty($recipe_title)) {
+                            break;
+                        }
+                    }
+                }
+                
+                if (empty($recipe_title)) {
+                    $recipe_title = sprintf(__('Recette %d', 'ai-content-factory-pro'), $item['item']);
+                }
+                
+                // Ajouter le titre (H2)
+                $content .= '<h2>' . esc_html($recipe_title) . '</h2>';
+                $content .= "\n";
+                
+                // Ajouter l'image correspondante
+                if (isset($generated_images[$index])) {
+                    $content .= '<figure class="wp-block-image size-large">';
+                    $content .= '<img src="' . esc_url($generated_images[$index]['url']) . '" alt="' . esc_attr($recipe_title) . '" />';
+                    $content .= '</figure>';
+                    $content .= "\n";
+                }
+                
+                // Ajouter le texte de la recette
+                $content .= '<div class="recipe-content">' . wpautop($recipe_text) . '</div>';
+                $content .= "\n";
+                
+                // Séparateur entre recettes
+                if ($index < count($generated_content) - 1) {
+                    $content .= '<hr class="wp-block-separator" />';
+                    $content .= "\n\n";
+                }
+            }
+        }
+        
+        return $content;
+    }
+    
+    /**
+     * Définir une image comme image à la une depuis une URL
+     */
+    private static function set_featured_image_from_url($post_id, $image_url) {
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+        
+        // Télécharger l'image
+        $tmp = download_url($image_url);
+        
+        if (is_wp_error($tmp)) {
+            return false;
+        }
+        
+        $file_array = array(
+            'name' => basename($image_url) . '.jpg',
+            'tmp_name' => $tmp
+        );
+        
+        // Importer comme attachement
+        $attachment_id = media_handle_sideload($file_array, $post_id);
+        
+        if (is_wp_error($attachment_id)) {
+            @unlink($file_array['tmp_name']);
+            return false;
+        }
+        
+        // Définir comme image à la une
+        set_post_thumbnail($post_id, $attachment_id);
+        
+        return $attachment_id;
+    }
+    
+    /**
+     * Construire le contenu de l'article (ancienne version)
      */
     private static function build_post_content($generated_content, $generated_images) {
         $content = '';

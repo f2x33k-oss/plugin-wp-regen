@@ -27,6 +27,8 @@ class AICFP_Ajax_Handler {
         add_action('wp_ajax_aicfp_cancel_task', array($this, 'cancel_task'));
         add_action('wp_ajax_aicfp_delete_task', array($this, 'delete_task'));
         add_action('wp_ajax_aicfp_calculate_estimate', array($this, 'calculate_estimate'));
+        add_action('wp_ajax_aicfp_suggest_titles', array($this, 'suggest_titles'));
+        add_action('wp_ajax_aicfp_search_pinterest', array($this, 'search_pinterest'));
     }
     
     /**
@@ -89,6 +91,9 @@ class AICFP_Ajax_Handler {
         $cost_estimate = AICFP_API_Handler::calculate_cost($item_count, $generate_text);
         $time_estimate = AICFP_API_Handler::calculate_time($item_count, $generate_text);
         
+        // Option de publication WordPress
+        $publish_article = isset($_POST['publish_article']) ? (bool) $_POST['publish_article'] : false;
+        
         // Créer la tâche
         $task_id = AICFP_Database::insert_task(array(
             'title' => $title,
@@ -103,6 +108,11 @@ class AICFP_Ajax_Handler {
             wp_send_json_error(array(
                 'message' => $task_id->get_error_message()
             ));
+        }
+        
+        // Stocker l'option de publication comme métadonnée
+        if ($generate_text) {
+            update_post_meta($task_id, '_aicfp_publish_article', $publish_article);
         }
         
         wp_send_json_success(array(
@@ -309,6 +319,183 @@ class AICFP_Ajax_Handler {
         }
         
         return $dest_path;
+    }
+    
+    /**
+     * Suggérer des titres basés sur l'historique
+     */
+    public function suggest_titles() {
+        $this->verify_request();
+        
+        global $wpdb;
+        $table_name = AICFP_Database::get_table_name();
+        
+        // Récupérer les N derniers titres
+        $history_count = get_option('aicfp_title_history_count', 15);
+        $suggestions_count = get_option('aicfp_suggestions_count', 3);
+        
+        $recent_titles = $wpdb->get_col($wpdb->prepare(
+            "SELECT title FROM $table_name 
+             WHERE title IS NOT NULL AND title != '' 
+             ORDER BY created_at DESC 
+             LIMIT %d",
+            $history_count
+        ));
+        
+        if (empty($recent_titles)) {
+            wp_send_json_success(array(
+                'suggestions' => array(
+                    '10 recettes de gratins savoureux',
+                    '15 desserts faciles et rapides',
+                    '20 plats de pâtes créatifs'
+                )
+            ));
+            return;
+        }
+        
+        // Créer le prompt pour ChatGPT
+        $titles_list = implode("\n", array_map(function($title, $index) {
+            return ($index + 1) . ". " . $title;
+        }, $recent_titles, array_keys($recent_titles)));
+        
+        $prompt = "Voici les $history_count derniers titres d'albums recettes générés :\n\n$titles_list\n\n";
+        $prompt .= "À partir de ces titres, crée exactement $suggestions_count nouvelles suggestions de titres d'albums recettes originales.\n";
+        $prompt .= "Les suggestions doivent être des variantes ou sous-thèmes inspirés de ces titres existants.\n";
+        $prompt .= "Chaque titre doit commencer par un nombre (ex: '15 recettes de...', '20 idées de...').\n";
+        $prompt .= "Réponds UNIQUEMENT avec les $suggestions_count titres, un par ligne, sans numérotation, sans explication.";
+        
+        $api_key = get_option('aicfp_openai_api_key');
+        
+        if (empty($api_key)) {
+            wp_send_json_error(array(
+                'message' => __('Clé API OpenAI non configurée.', 'ai-content-factory-pro')
+            ));
+        }
+        
+        $response = wp_remote_post('https://api.openai.com/v1/chat/completions', array(
+            'timeout' => 30,
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer ' . $api_key
+            ),
+            'body' => wp_json_encode(array(
+                'model' => 'gpt-4o',
+                'messages' => array(
+                    array(
+                        'role' => 'system',
+                        'content' => 'Tu es un assistant créatif qui génère des titres d\'albums recettes.'
+                    ),
+                    array(
+                        'role' => 'user',
+                        'content' => $prompt
+                    )
+                ),
+                'max_tokens' => 200,
+                'temperature' => 0.8
+            ))
+        ));
+        
+        if (is_wp_error($response)) {
+            wp_send_json_error(array(
+                'message' => $response->get_error_message()
+            ));
+        }
+        
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+        
+        if (!isset($data['choices'][0]['message']['content'])) {
+            wp_send_json_error(array(
+                'message' => __('Impossible de générer des suggestions.', 'ai-content-factory-pro')
+            ));
+        }
+        
+        $content = trim($data['choices'][0]['message']['content']);
+        $suggestions = array_filter(array_map('trim', explode("\n", $content)));
+        
+        // S'assurer qu'on a exactement le bon nombre de suggestions
+        $suggestions = array_slice($suggestions, 0, $suggestions_count);
+        
+        wp_send_json_success(array(
+            'suggestions' => array_values($suggestions)
+        ));
+    }
+    
+    /**
+     * Rechercher des images sur Pinterest
+     */
+    public function search_pinterest() {
+        $this->verify_request();
+        
+        $query = sanitize_text_field($_POST['query'] ?? '');
+        
+        if (empty($query)) {
+            wp_send_json_error(array(
+                'message' => __('Terme de recherche requis.', 'ai-content-factory-pro')
+            ));
+        }
+        
+        $api_key = get_option('aicfp_pinterest_rapidapi_key');
+        
+        if (empty($api_key)) {
+            $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3'; // Clé par défaut
+        }
+        
+        // Utiliser l'API Pinterest non officielle via RapidAPI
+        // Exemple d'endpoint : pinterest-scraper ou pinterest-api
+        $response = wp_remote_get(
+            'https://pinterest-scraper.p.rapidapi.com/search?query=' . urlencode($query) . '&limit=50',
+            array(
+                'timeout' => 30,
+                'headers' => array(
+                    'x-rapidapi-host' => 'pinterest-scraper.p.rapidapi.com',
+                    'x-rapidapi-key' => $api_key
+                )
+            )
+        );
+        
+        if (is_wp_error($response)) {
+            wp_send_json_error(array(
+                'message' => $response->get_error_message()
+            ));
+        }
+        
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+        
+        // Adapter selon le format de réponse de l'API Pinterest utilisée
+        $images = array();
+        
+        if (isset($data['results']) && is_array($data['results'])) {
+            foreach ($data['results'] as $item) {
+                $images[] = array(
+                    'url' => $item['image']['url'] ?? $item['images']['orig']['url'] ?? '',
+                    'thumbnail' => $item['image']['url'] ?? $item['images']['236x']['url'] ?? '',
+                    'title' => $item['title'] ?? $item['grid_title'] ?? '',
+                    'id' => $item['id'] ?? uniqid()
+                );
+            }
+        } elseif (isset($data['pins']) && is_array($data['pins'])) {
+            foreach ($data['pins'] as $pin) {
+                $images[] = array(
+                    'url' => $pin['images']['orig']['url'] ?? '',
+                    'thumbnail' => $pin['images']['236x']['url'] ?? '',
+                    'title' => $pin['title'] ?? $pin['grid_title'] ?? '',
+                    'id' => $pin['id'] ?? uniqid()
+                );
+            }
+        }
+        
+        if (empty($images)) {
+            wp_send_json_error(array(
+                'message' => __('Aucune image trouvée pour cette recherche.', 'ai-content-factory-pro')
+            ));
+        }
+        
+        wp_send_json_success(array(
+            'images' => $images,
+            'count' => count($images)
+        ));
     }
     
     /**

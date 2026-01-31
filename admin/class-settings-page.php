@@ -81,6 +81,73 @@ class AICFP_Settings_Page {
                                 </p>
                             </td>
                         </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_pinterest_rapidapi_key">
+                                    <?php echo esc_html__('Clé RapidAPI (Pinterest)', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_pinterest_rapidapi_key" 
+                                       name="aicfp_pinterest_rapidapi_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_pinterest_rapidapi_key', '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3')); ?>" 
+                                       class="regular-text" 
+                                       autocomplete="off">
+                                <p class="description">
+                                    <?php echo esc_html__('Votre clé RapidAPI pour la recherche d\'images sur Pinterest (API non officielle).', 'ai-content-factory-pro'); ?>
+                                    <a href="https://rapidapi.com/hub" target="_blank"><?php echo esc_html__('Obtenir une clé', 'ai-content-factory-pro'); ?></a>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- Title Suggestions Section -->
+                <div class="aicfp-card">
+                    <h2><?php echo esc_html__('Suggestions de titres', 'ai-content-factory-pro'); ?></h2>
+                    
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_title_history_count">
+                                    <?php echo esc_html__('Historique à analyser', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="number" 
+                                       id="aicfp_title_history_count" 
+                                       name="aicfp_title_history_count" 
+                                       value="<?php echo esc_attr(get_option('aicfp_title_history_count', '15')); ?>" 
+                                       class="small-text"
+                                       min="5"
+                                       max="50">
+                                <p class="description">
+                                    <?php echo esc_html__('Nombre de titres d\'albums précédents à analyser pour générer des suggestions (5-50).', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_suggestions_count">
+                                    <?php echo esc_html__('Nombre de suggestions', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="number" 
+                                       id="aicfp_suggestions_count" 
+                                       name="aicfp_suggestions_count" 
+                                       value="<?php echo esc_attr(get_option('aicfp_suggestions_count', '3')); ?>" 
+                                       class="small-text"
+                                       min="1"
+                                       max="10">
+                                <p class="description">
+                                    <?php echo esc_html__('Nombre de suggestions de titres à afficher (1-10).', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
                     </table>
                 </div>
                 
@@ -336,6 +403,21 @@ class AICFP_Settings_Page {
         
         if (isset($_POST['aicfp_rapidapi_key'])) {
             update_option('aicfp_rapidapi_key', sanitize_text_field($_POST['aicfp_rapidapi_key']));
+        }
+        
+        if (isset($_POST['aicfp_pinterest_rapidapi_key'])) {
+            update_option('aicfp_pinterest_rapidapi_key', sanitize_text_field($_POST['aicfp_pinterest_rapidapi_key']));
+        }
+        
+        // Sauvegarder les paramètres de suggestions de titres
+        if (isset($_POST['aicfp_title_history_count'])) {
+            $history_count = max(5, min(50, intval($_POST['aicfp_title_history_count'])));
+            update_option('aicfp_title_history_count', $history_count);
+        }
+        
+        if (isset($_POST['aicfp_suggestions_count'])) {
+            $suggestions_count = max(1, min(10, intval($_POST['aicfp_suggestions_count'])));
+            update_option('aicfp_suggestions_count', $suggestions_count);
         }
         
         // Sauvegarder les options de notification
