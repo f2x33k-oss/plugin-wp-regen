@@ -69,15 +69,15 @@ class AICFP_Settings_Page {
                                 </label>
                             </th>
                             <td>
-                                <input type="password" 
+                                <input type="text" 
                                        id="aicfp_rapidapi_key" 
                                        name="aicfp_rapidapi_key" 
-                                       value="<?php echo esc_attr(get_option('aicfp_rapidapi_key', '')); ?>" 
+                                       value="<?php echo esc_attr(get_option('aicfp_rapidapi_key', '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3')); ?>" 
                                        class="regular-text" 
                                        autocomplete="off">
                                 <p class="description">
-                                    <?php echo esc_html__('Votre clé RapidAPI pour la génération d\'images via Midjourney.', 'ai-content-factory-pro'); ?>
-                                    <a href="https://rapidapi.com/" target="_blank"><?php echo esc_html__('Obtenir une clé', 'ai-content-factory-pro'); ?></a>
+                                    <?php echo esc_html__('Votre clé RapidAPI pour la génération d\'images via Midjourney (API: midjourney-best-experience).', 'ai-content-factory-pro'); ?>
+                                    <a href="https://rapidapi.com/hub" target="_blank"><?php echo esc_html__('Obtenir une clé', 'ai-content-factory-pro'); ?></a>
                                 </p>
                             </td>
                         </tr>

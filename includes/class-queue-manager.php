@@ -105,10 +105,25 @@ class AICFP_Queue_Manager {
         // Générer le prompt pour l'item
         $prompt = self::generate_prompt($task, $item_number);
         
-        // Si génération de texte activée, générer via ChatGPT
+        // ÉTAPE 1: Générer l'image via Midjourney EN PREMIER
+        $reference_images = maybe_unserialize($task->reference_images);
+        $image_url = AICFP_API_Handler::generate_image($prompt, $reference_images);
+        
+        if (is_wp_error($image_url)) {
+            self::log_error($task_id, sprintf(
+                __('Erreur génération image item %d: %s', 'ai-content-factory-pro'),
+                $item_number,
+                $image_url->get_error_message()
+            ));
+            // Continuer avec l'item suivant même si l'image a échoué
+            $image_url = null;
+        }
+        
+        // ÉTAPE 2: Générer le texte via ChatGPT en analysant l'image générée
         $content = '';
         if ($task->generate_text) {
-            $content = AICFP_API_Handler::generate_text($prompt);
+            // Passer l'URL de l'image générée à GPT-4o Vision pour analyse
+            $content = AICFP_API_Handler::generate_text($prompt, $image_url);
             if (is_wp_error($content)) {
                 self::log_error($task_id, sprintf(
                     __('Erreur génération texte item %d: %s', 'ai-content-factory-pro'),
@@ -119,19 +134,8 @@ class AICFP_Queue_Manager {
             }
         }
         
-        // Générer l'image via Midjourney
-        $reference_images = maybe_unserialize($task->reference_images);
-        $image_url = AICFP_API_Handler::generate_image($prompt, $reference_images);
-        
-        if (is_wp_error($image_url)) {
-            self::log_error($task_id, sprintf(
-                __('Erreur génération image item %d: %s', 'ai-content-factory-pro'),
-                $item_number,
-                $image_url->get_error_message()
-            ));
-            // Continuer avec l'item suivant
-        } else {
-            // Sauvegarder l'image générée
+        // Sauvegarder les résultats
+        if ($image_url) {
             $generated_images = maybe_unserialize($task->generated_images) ?: array();
             $generated_images[] = array(
                 'item' => $item_number,
@@ -139,16 +143,19 @@ class AICFP_Queue_Manager {
                 'prompt' => $prompt
             );
             
+            AICFP_Database::update_task($task_id, array(
+                'generated_images' => maybe_serialize($generated_images)
+            ));
+        }
+        
+        if ($content) {
             $generated_content_array = maybe_unserialize($task->generated_content) ?: array();
-            if ($content) {
-                $generated_content_array[] = array(
-                    'item' => $item_number,
-                    'content' => $content
-                );
-            }
+            $generated_content_array[] = array(
+                'item' => $item_number,
+                'content' => $content
+            );
             
             AICFP_Database::update_task($task_id, array(
-                'generated_images' => maybe_serialize($generated_images),
                 'generated_content' => maybe_serialize($generated_content_array)
             ));
         }

@@ -18,32 +18,60 @@ class AICFP_API_Handler {
     /**
      * Générer du texte via OpenAI ChatGPT
      */
-    public static function generate_text($prompt) {
+    public static function generate_text($prompt, $image_url = null) {
         $api_key = get_option('aicfp_openai_api_key');
         
         if (empty($api_key)) {
             return new WP_Error('no_api_key', __('Clé API OpenAI non configurée.', 'ai-content-factory-pro'));
         }
         
+        // Prompt système pour les recettes
+        $system_prompt = "Tu es un chef cuisinier expert qui crée des recettes détaillées et appétissantes. Tu respectes toujours le format demandé avec précision.";
+        
+        // Prompt utilisateur avec instructions détaillées
+        $user_prompt = "Ecris-moi une recette à partir de ce titre : \"$prompt\" en la présentant de cette façon : un titre court et explicite, le nombre de personne pour la recette, le temps de préparation puis les ingrédients (Utilise des émoticones devant chaque ingrédient) avec le grammage, les étapes de préparation très détaillées avec des émoticones, (Numérote chaque étape (1️⃣, 2️⃣, 3️⃣...), commence chaque étape par un emoji correspondant à l'action ou l'ingrédient), une astuce pour faciliter la recette, un ingrédient à échanger, une astuce de cuisson. Ne mentionne jamais \"Comme sur la photo\" ou \"visible sur l'image\" dans la recette.";
+        
+        // Si une image est fournie, utiliser l'API vision de GPT-4o
+        $messages = array(
+            array(
+                'role' => 'system',
+                'content' => $system_prompt
+            )
+        );
+        
+        if ($image_url) {
+            $messages[] = array(
+                'role' => 'user',
+                'content' => array(
+                    array(
+                        'type' => 'text',
+                        'text' => $user_prompt
+                    ),
+                    array(
+                        'type' => 'image_url',
+                        'image_url' => array(
+                            'url' => $image_url
+                        )
+                    )
+                )
+            );
+        } else {
+            $messages[] = array(
+                'role' => 'user',
+                'content' => $user_prompt
+            );
+        }
+        
         $response = wp_remote_post('https://api.openai.com/v1/chat/completions', array(
-            'timeout' => 60,
+            'timeout' => 90,
             'headers' => array(
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer ' . $api_key
             ),
             'body' => wp_json_encode(array(
                 'model' => 'gpt-4o',
-                'messages' => array(
-                    array(
-                        'role' => 'system',
-                        'content' => 'Tu es un assistant qui génère du contenu de qualité pour des articles de blog.'
-                    ),
-                    array(
-                        'role' => 'user',
-                        'content' => $prompt
-                    )
-                ),
-                'max_tokens' => 1000,
+                'messages' => $messages,
+                'max_tokens' => 2000,
                 'temperature' => 0.7
             ))
         ));
@@ -72,44 +100,66 @@ class AICFP_API_Handler {
     public static function generate_image($prompt, $reference_images = null) {
         $api_key = get_option('aicfp_rapidapi_key');
         
+        // Clé API par défaut si non configurée (pour les tests)
         if (empty($api_key)) {
-            return new WP_Error('no_api_key', __('Clé API RapidAPI non configurée.', 'ai-content-factory-pro'));
+            $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3';
         }
         
-        // Construire le payload
-        $payload = array(
-            'prompt' => $prompt,
-            'aspect_ratio' => '16:9'
-        );
-        
-        // Ajouter les URLs de référence si disponibles
+        // Construire le prompt avec les références d'images si disponibles
+        $full_prompt = $prompt;
         if (!empty($reference_images) && is_array($reference_images)) {
-            $payload['ref_urls'] = array_slice($reference_images, 0, 5); // Max 5 images
+            // Ajouter les URLs des images de référence au prompt avec --sref
+            $ref_urls = implode(' ', array_slice($reference_images, 0, 5));
+            $full_prompt .= ' --sref ' . $ref_urls;
         }
+        
+        // API Midjourney Best Experience
+        $api_url = 'https://midjourney-best-experience.p.rapidapi.com/mj/imagine';
         
         // Envoyer la requête POST pour créer la tâche
-        $response = wp_remote_post('https://midjourney-api-ai.p.rapidapi.com/imagine', array(
+        $response = wp_remote_post($api_url, array(
             'timeout' => 30,
             'headers' => array(
                 'Content-Type' => 'application/json',
-                'X-RapidAPI-Key' => $api_key,
-                'X-RapidAPI-Host' => 'midjourney-api-ai.p.rapidapi.com'
+                'x-rapidapi-host' => 'midjourney-best-experience.p.rapidapi.com',
+                'x-rapidapi-key' => $api_key
             ),
-            'body' => wp_json_encode($payload)
+            'body' => wp_json_encode(array(
+                'prompt' => $full_prompt,
+                'aspect_ratio' => '16:9',
+                'process_mode' => 'relax'
+            ))
         ));
         
         if (is_wp_error($response)) {
             return $response;
         }
         
+        $response_code = wp_remote_retrieve_response_code($response);
         $body = wp_remote_retrieve_body($response);
         $data = json_decode($body, true);
         
-        if (!isset($data['task_id'])) {
-            return new WP_Error('midjourney_error', __('Impossible de créer la tâche Midjourney.', 'ai-content-factory-pro'));
+        // Logger la réponse pour débogage
+        error_log('Midjourney API Response: ' . print_r($data, true));
+        
+        if ($response_code !== 200 && $response_code !== 201) {
+            $error_message = isset($data['message']) ? $data['message'] : __('Erreur lors de la création de la tâche Midjourney.', 'ai-content-factory-pro');
+            return new WP_Error('midjourney_error', $error_message . ' (Code: ' . $response_code . ')');
         }
         
-        $task_id = $data['task_id'];
+        // Vérifier si nous avons un task_id ou message_id
+        $task_id = null;
+        if (isset($data['task_id'])) {
+            $task_id = $data['task_id'];
+        } elseif (isset($data['messageId'])) {
+            $task_id = $data['messageId'];
+        } elseif (isset($data['id'])) {
+            $task_id = $data['id'];
+        }
+        
+        if (!$task_id) {
+            return new WP_Error('midjourney_error', __('Impossible de créer la tâche Midjourney. Aucun ID retourné.', 'ai-content-factory-pro'));
+        }
         
         // Polling pour attendre la complétion
         $image_url = self::poll_midjourney_task($task_id, $api_key);
@@ -133,24 +183,26 @@ class AICFP_API_Handler {
      * Polling de la tâche Midjourney
      */
     private static function poll_midjourney_task($task_id, $api_key) {
-        $max_attempts = 30; // 30 tentatives * 20 secondes = 10 minutes max
+        $max_attempts = 40; // 40 tentatives * 15 secondes = 10 minutes max
         $attempt = 0;
         
         while ($attempt < $max_attempts) {
-            sleep(20); // Attendre 20 secondes entre chaque tentative
+            sleep(15); // Attendre 15 secondes entre chaque tentative
             
+            // Vérifier le statut de la tâche
             $response = wp_remote_get(
-                'https://midjourney-api-ai.p.rapidapi.com/status/' . $task_id,
+                'https://midjourney-best-experience.p.rapidapi.com/mj/message/' . $task_id,
                 array(
                     'timeout' => 30,
                     'headers' => array(
-                        'X-RapidAPI-Key' => $api_key,
-                        'X-RapidAPI-Host' => 'midjourney-api-ai.p.rapidapi.com'
+                        'x-rapidapi-host' => 'midjourney-best-experience.p.rapidapi.com',
+                        'x-rapidapi-key' => $api_key
                     )
                 )
             );
             
             if (is_wp_error($response)) {
+                error_log('Midjourney polling error: ' . $response->get_error_message());
                 $attempt++;
                 continue;
             }
@@ -158,20 +210,47 @@ class AICFP_API_Handler {
             $body = wp_remote_retrieve_body($response);
             $data = json_decode($body, true);
             
-            if (isset($data['status']) && $data['status'] === 'completed') {
-                if (isset($data['image_url'])) {
-                    return $data['image_url'];
+            // Logger la réponse pour débogage
+            error_log('Midjourney polling response (attempt ' . ($attempt + 1) . '): ' . print_r($data, true));
+            
+            // Vérifier différents formats de réponse possibles
+            $status = null;
+            $image_url = null;
+            
+            if (isset($data['status'])) {
+                $status = $data['status'];
+            } elseif (isset($data['progress'])) {
+                $status = $data['progress'] >= 100 ? 'completed' : 'processing';
+            }
+            
+            // Image URL peut être dans différents champs
+            if (isset($data['image_url'])) {
+                $image_url = $data['image_url'];
+            } elseif (isset($data['uri'])) {
+                $image_url = $data['uri'];
+            } elseif (isset($data['url'])) {
+                $image_url = $data['url'];
+            } elseif (isset($data['imageUrl'])) {
+                $image_url = $data['imageUrl'];
+            }
+            
+            // Vérifier si la tâche est terminée
+            if ($status === 'completed' || $status === 'done' || $status === 'success') {
+                if ($image_url) {
+                    return $image_url;
                 }
             }
             
-            if (isset($data['status']) && $data['status'] === 'failed') {
-                return new WP_Error('midjourney_failed', __('La génération de l\'image a échoué.', 'ai-content-factory-pro'));
+            // Vérifier si la tâche a échoué
+            if ($status === 'failed' || $status === 'error') {
+                $error_msg = isset($data['error']) ? $data['error'] : __('La génération de l\'image a échoué.', 'ai-content-factory-pro');
+                return new WP_Error('midjourney_failed', $error_msg);
             }
             
             $attempt++;
         }
         
-        return new WP_Error('midjourney_timeout', __('Timeout: L\'image n\'a pas été générée à temps.', 'ai-content-factory-pro'));
+        return new WP_Error('midjourney_timeout', __('Timeout: L\'image n\'a pas été générée à temps après 10 minutes.', 'ai-content-factory-pro'));
     }
     
     /**
