@@ -8,9 +8,15 @@
     });
     
     function initAlbumsRecettes() {
-        if ($('#aicfp-albums-recettes-form').length === 0) {
+        // Vérifier si le formulaire existe
+        const $form = $('#aicfp-albums-recettes-form');
+        
+        if ($form.length === 0) {
+            console.log('AICFP: Formulaire Albums Recettes non trouvé');
             return;
         }
+        
+        console.log('AICFP: Initialisation Albums Recettes OK');
         
         // Calculateur en temps réel
         $('#aicfp_title').on('input change', function() {

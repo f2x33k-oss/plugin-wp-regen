@@ -3,7 +3,7 @@
  * Plugin Name: AI Content Factory Pro
  * Plugin URI: https://example.com/ai-content-factory-pro
  * Description: Génération automatique de contenu et d'images via OpenAI et Midjourney avec système de file d'attente avancé.
- * Version: 1.0.0
+ * Version: 1.6.0
  * Author: AI Content Factory Team
  * Author URI: https://example.com
  * Text Domain: ai-content-factory-pro
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Définir les constantes du plugin
-define('AICFP_VERSION', '1.0.0');
+define('AICFP_VERSION', '1.6.0');
 define('AICFP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AICFP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AICFP_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -164,10 +164,22 @@ class AI_Content_Factory_Pro {
      * Enregistrer les scripts et styles pour l'admin
      */
     public function enqueue_admin_assets($hook) {
-        // Charger uniquement sur les pages du plugin
-        if (strpos($hook, 'aicfp') === false && $hook !== 'post.php' && $hook !== 'post-new.php') {
+        // Debug: Logger le hook pour diagnostic
+        error_log('AICFP: Hook page = ' . $hook);
+        
+        // Charger sur toutes les pages du plugin
+        $is_plugin_page = (
+            strpos($hook, 'aicfp') !== false ||
+            strpos($hook, 'ai-content-factory') !== false ||
+            $hook === 'post.php' ||
+            $hook === 'post-new.php'
+        );
+        
+        if (!$is_plugin_page) {
             return;
         }
+        
+        error_log('AICFP: Chargement des assets sur ' . $hook);
         
         // Styles principaux
         wp_enqueue_style(
@@ -215,20 +227,36 @@ class AI_Content_Factory_Pro {
             );
         }
         
-        // Localiser les scripts pour AJAX
+        // Toujours localiser pour AJAX (nécessaire pour tous les scripts)
+        $localize_data = array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('aicfp_nonce'),
+            'plugin_url' => AICFP_PLUGIN_URL,
+            'strings' => array(
+                'confirm_cancel' => __('Êtes-vous sûr de vouloir annuler cette tâche ?', 'ai-content-factory-pro'),
+                'confirm_delete' => __('Êtes-vous sûr de vouloir supprimer cette tâche ?', 'ai-content-factory-pro'),
+                'error_occurred' => __('Une erreur est survenue. Veuillez réessayer.', 'ai-content-factory-pro'),
+            )
+        );
+        
+        // Localiser chaque script chargé
         $scripts = array('aicfp-albums-recettes', 'aicfp-albums-idees', 'aicfp-instances');
         foreach ($scripts as $script) {
-            if (wp_script_is($script, 'enqueued')) {
-                wp_localize_script($script, 'aicfp_ajax', array(
-                    'ajax_url' => admin_url('admin-ajax.php'),
-                    'nonce' => wp_create_nonce('aicfp_nonce'),
-                    'strings' => array(
-                        'confirm_cancel' => __('Êtes-vous sûr de vouloir annuler cette tâche ?', 'ai-content-factory-pro'),
-                        'confirm_delete' => __('Êtes-vous sûr de vouloir supprimer cette tâche ?', 'ai-content-factory-pro'),
-                        'error_occurred' => __('Une erreur est survenue. Veuillez réessayer.', 'ai-content-factory-pro'),
-                    )
-                ));
+            if (wp_script_is($script, 'enqueued') || wp_script_is($script, 'registered')) {
+                wp_localize_script($script, 'aicfp_ajax', $localize_data);
+                error_log('AICFP: Localized script ' . $script);
             }
+        }
+        
+        // Fallback: Si aucun script spécifique, créer l'objet global
+        if (!wp_script_is('aicfp-albums-recettes', 'enqueued') && 
+            !wp_script_is('aicfp-albums-idees', 'enqueued') && 
+            !wp_script_is('aicfp-instances', 'enqueued')) {
+            
+            wp_add_inline_script('jquery', 
+                'var aicfp_ajax = ' . wp_json_encode($localize_data) . ';'
+            );
+            error_log('AICFP: Added inline aicfp_ajax object');
         }
     }
     
