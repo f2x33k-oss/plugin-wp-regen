@@ -116,6 +116,63 @@ class AICFP_Albums_Recettes_Page {
                                         </p>
                                     </div>
                                     
+                                    <!-- Sélection API de génération d'images -->
+                                    <div class="aicfp-form-group">
+                                        <label for="aicfp_image_api" class="aicfp-label">
+                                            <span class="dashicons dashicons-admin-settings"></span>
+                                            <?php echo esc_html__('Moteur de génération d\'images', 'ai-content-factory-pro'); ?>
+                                        </label>
+                                        <select id="aicfp_image_api" name="image_api" class="aicfp-input aicfp-api-selector">
+                                            <option value="midjourney" selected><?php echo esc_html__('🎨 Midjourney (RapidAPI)', 'ai-content-factory-pro'); ?></option>
+                                            <option value="sdxl"><?php echo esc_html__('🖼️ Stable Diffusion XL', 'ai-content-factory-pro'); ?></option>
+                                            <option value="sdxl-food"><?php echo esc_html__('🍽️ SDXL Food LoRA (Spécialisé recettes)', 'ai-content-factory-pro'); ?></option>
+                                            <option value="sdxl-finetuned"><?php echo esc_html__('⚡ Fine-tuned SDXL', 'ai-content-factory-pro'); ?></option>
+                                            <option value="dalle"><?php echo esc_html__('🤖 DALL-E 3 (ChatGPT)', 'ai-content-factory-pro'); ?></option>
+                                            <option value="nanobanana"><?php echo esc_html__('🍌 Nanobanana', 'ai-content-factory-pro'); ?></option>
+                                            <option value="replicate"><?php echo esc_html__('🔄 Replicate', 'ai-content-factory-pro'); ?></option>
+                                            <option value="flux-pro"><?php echo esc_html__('⚡ Flux Pro', 'ai-content-factory-pro'); ?></option>
+                                        </select>
+                                        <p class="aicfp-hint">
+                                            <?php echo esc_html__('Choisissez le moteur IA pour générer les images. SDXL Food LoRA est optimisé pour les recettes.', 'ai-content-factory-pro'); ?>
+                                        </p>
+                                        
+                                        <!-- Info API sélectionnée -->
+                                        <div id="aicfp-api-info" class="aicfp-api-info-panel">
+                                            <div class="aicfp-api-info-content" data-api="midjourney">
+                                                <strong>Midjourney</strong> - Qualité premium, style artistique
+                                                <br><small>Coût: ~$0.05/image • Temps: ~2 min/image</small>
+                                            </div>
+                                            <div class="aicfp-api-info-content" data-api="sdxl" style="display:none;">
+                                                <strong>Stable Diffusion XL</strong> - Polyvalent, rapide, économique
+                                                <br><small>Coût: ~$0.01/image • Temps: ~30s/image</small>
+                                            </div>
+                                            <div class="aicfp-api-info-content" data-api="sdxl-food" style="display:none;">
+                                                <strong>SDXL Food LoRA</strong> - Spécialisé recettes, ultra-réaliste
+                                                <br><small>Coût: ~$0.02/image • Temps: ~45s/image • ⭐ RECOMMANDÉ</small>
+                                            </div>
+                                            <div class="aicfp-api-info-content" data-api="sdxl-finetuned" style="display:none;">
+                                                <strong>Fine-tuned SDXL</strong> - Modèle optimisé personnalisé
+                                                <br><small>Coût: ~$0.02/image • Temps: ~40s/image</small>
+                                            </div>
+                                            <div class="aicfp-api-info-content" data-api="dalle" style="display:none;">
+                                                <strong>DALL-E 3</strong> - Par OpenAI, haute qualité
+                                                <br><small>Coût: ~$0.04/image • Temps: ~20s/image</small>
+                                            </div>
+                                            <div class="aicfp-api-info-content" data-api="nanobanana" style="display:none;">
+                                                <strong>Nanobanana</strong> - Rapide et créatif
+                                                <br><small>Coût: ~$0.02/image • Temps: ~30s/image</small>
+                                            </div>
+                                            <div class="aicfp-api-info-content" data-api="replicate" style="display:none;">
+                                                <strong>Replicate</strong> - Accès à multiples modèles
+                                                <br><small>Coût: Variable • Temps: ~1 min/image</small>
+                                            </div>
+                                            <div class="aicfp-api-info-content" data-api="flux-pro" style="display:none;">
+                                                <strong>Flux Pro</strong> - Nouvelle génération, ultra-rapide
+                                                <br><small>Coût: ~$0.03/image • Temps: ~15s/image</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                     <!-- Pinterest Search -->
                                     <div class="aicfp-form-group">
                                         <label class="aicfp-label">

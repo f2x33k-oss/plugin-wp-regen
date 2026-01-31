@@ -61,6 +61,7 @@ class AI_Content_Factory_Pro {
         require_once AICFP_PLUGIN_DIR . 'includes/class-database.php';
         require_once AICFP_PLUGIN_DIR . 'includes/class-queue-manager.php';
         require_once AICFP_PLUGIN_DIR . 'includes/class-api-handler.php';
+        require_once AICFP_PLUGIN_DIR . 'includes/class-image-api-manager.php';
         require_once AICFP_PLUGIN_DIR . 'includes/class-email-handler.php';
         require_once AICFP_PLUGIN_DIR . 'includes/class-file-handler.php';
         

@@ -94,6 +94,18 @@ class AICFP_Ajax_Handler {
         // Option de publication WordPress
         $publish_article = isset($_POST['publish_article']) ? (bool) $_POST['publish_article'] : false;
         
+        // API de génération d'images sélectionnée
+        $image_api = sanitize_text_field($_POST['image_api'] ?? 'midjourney');
+        
+        // Recalculer avec l'API sélectionnée
+        $text_cost = $generate_text ? ($item_count * 0.02) : 0;
+        $image_cost = $item_count * AICFP_Image_API_Manager::get_cost_per_image($image_api);
+        $cost_estimate = $text_cost + $image_cost;
+        
+        $text_time = $generate_text ? ($item_count * 0.5) : 0;
+        $image_time = $item_count * AICFP_Image_API_Manager::get_time_per_image($image_api);
+        $time_estimate = ceil($text_time + $image_time);
+        
         // Créer la tâche
         $task_id = AICFP_Database::insert_task(array(
             'title' => $title,
@@ -110,10 +122,11 @@ class AICFP_Ajax_Handler {
             ));
         }
         
-        // Stocker l'option de publication comme métadonnée
+        // Stocker les options comme métadonnées
         if ($generate_text) {
             update_post_meta($task_id, '_aicfp_publish_article', $publish_article);
         }
+        update_post_meta($task_id, '_aicfp_image_api', $image_api);
         
         wp_send_json_success(array(
             'message' => __('Tâche ajoutée à la file d\'attente avec succès.', 'ai-content-factory-pro'),
@@ -281,15 +294,25 @@ class AICFP_Ajax_Handler {
         
         $title = sanitize_text_field($_POST['title'] ?? '');
         $generate_text = isset($_POST['generate_text']) ? (bool) $_POST['generate_text'] : true;
+        $image_api = sanitize_text_field($_POST['image_api'] ?? 'midjourney');
         
         $item_count = $this->extract_item_count($title);
-        $cost = AICFP_API_Handler::calculate_cost($item_count, $generate_text);
-        $time = AICFP_API_Handler::calculate_time($item_count, $generate_text);
+        
+        // Coût basé sur l'API sélectionnée
+        $text_cost = $generate_text ? ($item_count * 0.02) : 0;
+        $image_cost = $item_count * AICFP_Image_API_Manager::get_cost_per_image($image_api);
+        $total_cost = $text_cost + $image_cost;
+        
+        // Temps basé sur l'API sélectionnée
+        $text_time = $generate_text ? ($item_count * 0.5) : 0;
+        $image_time = $item_count * AICFP_Image_API_Manager::get_time_per_image($image_api);
+        $total_time = ceil($text_time + $image_time);
         
         wp_send_json_success(array(
-            'cost' => number_format($cost, 2),
-            'time' => $time,
-            'item_count' => $item_count
+            'cost' => number_format($total_cost, 2),
+            'time' => $total_time,
+            'item_count' => $item_count,
+            'api_info' => AICFP_Image_API_Manager::get_api_info($image_api)
         ));
     }
     

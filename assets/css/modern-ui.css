@@ -1081,6 +1081,53 @@
     font-weight: 600;
 }
 
+/* === API SELECTOR === */
+.aicfp-api-selector {
+    background: linear-gradient(to right, #ffffff, #f9fafb);
+    border: 2px solid var(--aicfp-border);
+    font-weight: 600;
+    padding: 14px 16px;
+}
+
+.aicfp-api-selector:focus {
+    background: white;
+}
+
+.aicfp-api-info-panel {
+    margin-top: 15px;
+    padding: 16px;
+    background: linear-gradient(135deg, #e7f5fe 0%, #f0f9ff 100%);
+    border-left: 4px solid var(--aicfp-primary);
+    border-radius: var(--aicfp-radius);
+    animation: fadeIn 0.3s ease;
+}
+
+.aicfp-api-info-content {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.aicfp-api-info-content strong {
+    color: var(--aicfp-primary);
+    font-size: 16px;
+}
+
+.aicfp-api-info-content small {
+    color: var(--aicfp-text-light);
+}
+
+.aicfp-api-info-content[data-api="sdxl-food"] {
+    background: linear-gradient(135deg, #fff7e6 0%, #ffe5b4 100%);
+    border-left-color: #ffc107;
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: 5px;
+}
+
+.aicfp-api-info-content[data-api="sdxl-food"] strong {
+    color: #f57c00;
+}
+
 /* === UTILITIES === */
 .aicfp-mt-20 { margin-top: 20px; }
 .aicfp-mb-20 { margin-bottom: 20px; }

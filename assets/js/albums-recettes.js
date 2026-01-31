@@ -26,6 +26,9 @@
         calculateEstimate();
         togglePublishOption();
         
+        // Sélecteur d'API
+        initApiSelector();
+        
         // Gestion des images individuelles
         initImageFields();
         
@@ -45,6 +48,7 @@
     function calculateEstimate() {
         const title = $('#aicfp_title').val();
         const generateText = $('#aicfp_generate_text').is(':checked');
+        const imageApi = $('#aicfp_image_api').val();
         
         if (!title) {
             $('#aicfp-estimated-items').text('-');
@@ -60,7 +64,8 @@
                 action: 'aicfp_calculate_estimate',
                 nonce: aicfp_ajax.nonce,
                 title: title,
-                generate_text: generateText
+                generate_text: generateText,
+                image_api: imageApi
             },
             success: function(response) {
                 if (response.success) {
@@ -79,6 +84,36 @@
             $('#aicfp-publish-option-row').fadeOut();
             $('#aicfp_publish_article').prop('checked', false);
         }
+    }
+    
+    function initApiSelector() {
+        $('#aicfp_image_api').on('change', function() {
+            const selectedApi = $(this).val();
+            
+            // Masquer toutes les infos
+            $('.aicfp-api-info-content').hide();
+            
+            // Afficher l'info de l'API sélectionnée
+            $('.aicfp-api-info-content[data-api="' + selectedApi + '"]').fadeIn();
+            
+            // Recalculer l'estimation avec le nouveau coût
+            calculateEstimate();
+        });
+    }
+    
+    function getApiCostPerImage() {
+        const api = $('#aicfp_image_api').val();
+        const costs = {
+            'midjourney': 0.05,
+            'sdxl': 0.01,
+            'sdxl-food': 0.02,
+            'sdxl-finetuned': 0.02,
+            'dalle': 0.04,
+            'nanobanana': 0.02,
+            'replicate': 0.03,
+            'flux-pro': 0.03
+        };
+        return costs[api] || 0.05;
     }
     
     function initImageFields() {

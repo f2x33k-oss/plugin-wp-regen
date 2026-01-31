@@ -104,6 +104,196 @@ class AICFP_Settings_Page {
                     </table>
                 </div>
                 
+                <!-- Image Generation APIs Section -->
+                <div class="aicfp-card">
+                    <h2><?php echo esc_html__('Moteurs de génération d\'images', 'ai-content-factory-pro'); ?></h2>
+                    <p class="description"><?php echo esc_html__('Configurez les clés API pour les différents moteurs de génération d\'images. Seules les clés des moteurs que vous utilisez sont nécessaires.', 'ai-content-factory-pro'); ?></p>
+                    
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_sdxl_api_key">
+                                    <?php echo esc_html__('Clé Stable Diffusion XL', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_sdxl_api_key" 
+                                       name="aicfp_sdxl_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_sdxl_api_key', '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <?php echo esc_html__('Polyvalent, rapide, économique (~$0.01/image)', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_sdxl_food_api_key">
+                                    <?php echo esc_html__('Clé SDXL Food LoRA', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_sdxl_food_api_key" 
+                                       name="aicfp_sdxl_food_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_sdxl_food_api_key', '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <strong style="color: #f57c00;">⭐ RECOMMANDÉ POUR RECETTES</strong> - Spécialisé food photography (~$0.02/image)
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_sdxl_finetuned_api_key">
+                                    <?php echo esc_html__('Clé Fine-tuned SDXL', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_sdxl_finetuned_api_key" 
+                                       name="aicfp_sdxl_finetuned_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_sdxl_finetuned_api_key', '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <?php echo esc_html__('Modèle optimisé personnalisé (~$0.02/image)', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_nanobanana_api_key">
+                                    <?php echo esc_html__('Clé Nanobanana', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_nanobanana_api_key" 
+                                       name="aicfp_nanobanana_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_nanobanana_api_key', '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <?php echo esc_html__('Rapide et créatif (~$0.02/image)', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_replicate_api_key">
+                                    <?php echo esc_html__('Clé Replicate', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_replicate_api_key" 
+                                       name="aicfp_replicate_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_replicate_api_key', '')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <?php echo esc_html__('Accès à multiples modèles (Coût variable)', 'ai-content-factory-pro'); ?>
+                                    <a href="https://replicate.com/account/api-tokens" target="_blank"><?php echo esc_html__('Obtenir une clé', 'ai-content-factory-pro'); ?></a>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_flux_api_key">
+                                    <?php echo esc_html__('Clé Flux Pro', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_flux_api_key" 
+                                       name="aicfp_flux_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_flux_api_key', '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <?php echo esc_html__('Nouvelle génération, ultra-rapide (~$0.03/image, ~15s)', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <div class="aicfp-api-comparison-table" style="margin-top: 20px;">
+                        <h3><?php echo esc_html__('Comparatif des moteurs', 'ai-content-factory-pro'); ?></h3>
+                        <table class="widefat" style="margin-top: 10px;">
+                            <thead>
+                                <tr>
+                                    <th><?php echo esc_html__('Moteur', 'ai-content-factory-pro'); ?></th>
+                                    <th><?php echo esc_html__('Coût/image', 'ai-content-factory-pro'); ?></th>
+                                    <th><?php echo esc_html__('Temps', 'ai-content-factory-pro'); ?></th>
+                                    <th><?php echo esc_html__('Qualité', 'ai-content-factory-pro'); ?></th>
+                                    <th><?php echo esc_html__('Spécialité', 'ai-content-factory-pro'); ?></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>SDXL Food LoRA</strong> ⭐</td>
+                                    <td>$0.02</td>
+                                    <td>~45s</td>
+                                    <td>⭐⭐⭐⭐⭐</td>
+                                    <td>Recettes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Flux Pro</strong></td>
+                                    <td>$0.03</td>
+                                    <td>~15s</td>
+                                    <td>⭐⭐⭐⭐</td>
+                                    <td>Rapide</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DALL-E 3</strong></td>
+                                    <td>$0.04</td>
+                                    <td>~20s</td>
+                                    <td>⭐⭐⭐⭐⭐</td>
+                                    <td>Général</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Midjourney</strong></td>
+                                    <td>$0.05</td>
+                                    <td>~2 min</td>
+                                    <td>⭐⭐⭐⭐⭐</td>
+                                    <td>Artistique</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Replicate</strong></td>
+                                    <td>$0.03</td>
+                                    <td>~1 min</td>
+                                    <td>⭐⭐⭐⭐</td>
+                                    <td>Flexible</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SDXL</strong></td>
+                                    <td>$0.01</td>
+                                    <td>~30s</td>
+                                    <td>⭐⭐⭐</td>
+                                    <td>Économique</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Nanobanana</strong></td>
+                                    <td>$0.02</td>
+                                    <td>~30s</td>
+                                    <td>⭐⭐⭐⭐</td>
+                                    <td>Créatif</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fine-tuned SDXL</strong></td>
+                                    <td>$0.02</td>
+                                    <td>~40s</td>
+                                    <td>⭐⭐⭐⭐</td>
+                                    <td>Personnalisé</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
                 <!-- Title Suggestions Section -->
                 <div class="aicfp-card">
                     <h2><?php echo esc_html__('Suggestions de titres', 'ai-content-factory-pro'); ?></h2>
@@ -407,6 +597,15 @@ class AICFP_Settings_Page {
         
         if (isset($_POST['aicfp_pinterest_rapidapi_key'])) {
             update_option('aicfp_pinterest_rapidapi_key', sanitize_text_field($_POST['aicfp_pinterest_rapidapi_key']));
+        }
+        
+        // Sauvegarder les clés des moteurs de génération d'images
+        $image_apis = array('sdxl', 'sdxl_food', 'sdxl_finetuned', 'nanobanana', 'replicate', 'flux');
+        foreach ($image_apis as $api) {
+            $key_name = 'aicfp_' . $api . '_api_key';
+            if (isset($_POST[$key_name])) {
+                update_option($key_name, sanitize_text_field($_POST[$key_name]));
+            }
         }
         
         // Sauvegarder les paramètres de suggestions de titres

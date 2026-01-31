@@ -105,9 +105,10 @@ class AICFP_Queue_Manager {
         // Générer le prompt pour l'item
         $prompt = self::generate_prompt($task, $item_number);
         
-        // ÉTAPE 1: Générer l'image via Midjourney EN PREMIER
+        // ÉTAPE 1: Générer l'image via l'API sélectionnée EN PREMIER
         $reference_images = maybe_unserialize($task->reference_images);
-        $image_url = AICFP_API_Handler::generate_image($prompt, $reference_images);
+        $image_api = get_post_meta($task->id, '_aicfp_image_api', true) ?: 'midjourney';
+        $image_url = AICFP_Image_API_Manager::generate_image($prompt, $image_api, $reference_images);
         
         if (is_wp_error($image_url)) {
             self::log_error($task_id, sprintf(
