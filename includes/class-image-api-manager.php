@@ -50,7 +50,7 @@ class AICFP_Image_API_Manager {
         $api_key = get_option('aicfp_sdxl_api_key');
         
         if (empty($api_key)) {
-            $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3'; // Clé par défaut
+            return new WP_Error('no_api_key', __('Clé API SDXL non configurée. Veuillez configurer votre clé RapidAPI dans Réglages.', 'ai-content-factory-pro'));
         }
         
         $payload = array(
@@ -97,7 +97,7 @@ class AICFP_Image_API_Manager {
         $api_key = get_option('aicfp_sdxl_food_api_key');
         
         if (empty($api_key)) {
-            $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3';
+            return new WP_Error('no_api_key', __('Clé API SDXL Food LoRA non configurée. Veuillez configurer votre clé RapidAPI avec abonnement SDXL Food LoRA dans Réglages.', 'ai-content-factory-pro'));
         }
         
         // Ajouter des prompts optimisés pour la nourriture
@@ -144,7 +144,7 @@ class AICFP_Image_API_Manager {
         $api_key = get_option('aicfp_sdxl_finetuned_api_key');
         
         if (empty($api_key)) {
-            $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3';
+            return new WP_Error('no_api_key', __('Clé API Fine-tuned SDXL non configurée. Veuillez configurer dans Réglages.', 'ai-content-factory-pro'));
         }
         
         $response = wp_remote_post('https://finetuned-diffusion.p.rapidapi.com/sdxl', array(
@@ -219,7 +219,7 @@ class AICFP_Image_API_Manager {
         $api_key = get_option('aicfp_nanobanana_api_key');
         
         if (empty($api_key)) {
-            $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3';
+            return new WP_Error('no_api_key', __('Clé API Nanobanana non configurée. Veuillez configurer dans Réglages.', 'ai-content-factory-pro'));
         }
         
         $response = wp_remote_post('https://nanobanana-ai.p.rapidapi.com/generate', array(
@@ -333,7 +333,7 @@ class AICFP_Image_API_Manager {
         $api_key = get_option('aicfp_flux_api_key');
         
         if (empty($api_key)) {
-            $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3';
+            return new WP_Error('no_api_key', __('Clé API Flux Pro non configurée. Veuillez configurer dans Réglages.', 'ai-content-factory-pro'));
         }
         
         $response = wp_remote_post('https://flux-pro.p.rapidapi.com/generate', array(

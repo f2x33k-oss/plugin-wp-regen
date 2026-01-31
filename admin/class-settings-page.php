@@ -41,6 +41,20 @@ class AICFP_Settings_Page {
                 <div class="aicfp-card">
                     <h2><?php echo esc_html__('Clés API', 'ai-content-factory-pro'); ?></h2>
                     
+                    <div style="background: #e7f5fe; border-left: 4px solid #2271b1; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                        <p style="margin: 0; font-weight: 600; color: #0c5d8c;">
+                            ℹ️ <?php echo esc_html__('Important : Configuration des clés API', 'ai-content-factory-pro'); ?>
+                        </p>
+                        <ul style="margin: 10px 0 0 0; color: #1d2327;">
+                            <li><strong>OpenAI</strong> : Obligatoire pour génération de textes (ChatGPT)</li>
+                            <li><strong>RapidAPI (Midjourney et Pinterest)</strong> : Pré-configurée et fonctionnelle ✅</li>
+                            <li><strong>Autres APIs</strong> : À configurer manuellement selon vos besoins</li>
+                        </ul>
+                        <p style="margin: 10px 0 0 0; font-size: 13px; color: #3c434a;">
+                            <?php echo esc_html__('La clé RapidAPI fournie fonctionne uniquement pour Midjourney et Pinterest. Pour les autres moteurs (SDXL, Flux Pro, etc.), vous devez souscrire séparément sur RapidAPI.', 'ai-content-factory-pro'); ?>
+                        </p>
+                    </div>
+                    
                     <table class="form-table">
                         <tr>
                             <th scope="row">
@@ -120,10 +134,12 @@ class AICFP_Settings_Page {
                                 <input type="text" 
                                        id="aicfp_sdxl_api_key" 
                                        name="aicfp_sdxl_api_key" 
-                                       value="<?php echo esc_attr(get_option('aicfp_sdxl_api_key', '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3')); ?>" 
-                                       class="regular-text">
+                                       value="<?php echo esc_attr(get_option('aicfp_sdxl_api_key', '')); ?>" 
+                                       class="regular-text"
+                                       placeholder="Entrez votre clé API RapidAPI pour SDXL">
                                 <p class="description">
-                                    <?php echo esc_html__('Polyvalent, rapide, économique (~$0.01/image)', 'ai-content-factory-pro'); ?>
+                                    <?php echo esc_html__('Polyvalent, rapide, économique (~$0.01/image) - Clé RapidAPI à configurer manuellement', 'ai-content-factory-pro'); ?>
+                                    <a href="https://rapidapi.com/hub" target="_blank"><?php echo esc_html__('Obtenir une clé', 'ai-content-factory-pro'); ?></a>
                                 </p>
                             </td>
                         </tr>
@@ -138,10 +154,13 @@ class AICFP_Settings_Page {
                                 <input type="text" 
                                        id="aicfp_sdxl_food_api_key" 
                                        name="aicfp_sdxl_food_api_key" 
-                                       value="<?php echo esc_attr(get_option('aicfp_sdxl_food_api_key', '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3')); ?>" 
-                                       class="regular-text">
+                                       value="<?php echo esc_attr(get_option('aicfp_sdxl_food_api_key', '')); ?>" 
+                                       class="regular-text"
+                                       placeholder="Entrez votre clé API RapidAPI pour SDXL Food">
                                 <p class="description">
                                     <strong style="color: #f57c00;">⭐ RECOMMANDÉ POUR RECETTES</strong> - Spécialisé food photography (~$0.02/image)
+                                    <br><?php echo esc_html__('Nécessite clé RapidAPI avec abonnement SDXL Food LoRA', 'ai-content-factory-pro'); ?>
+                                    <a href="https://rapidapi.com/hub" target="_blank"><?php echo esc_html__('Obtenir une clé', 'ai-content-factory-pro'); ?></a>
                                 </p>
                             </td>
                         </tr>
@@ -156,10 +175,11 @@ class AICFP_Settings_Page {
                                 <input type="text" 
                                        id="aicfp_sdxl_finetuned_api_key" 
                                        name="aicfp_sdxl_finetuned_api_key" 
-                                       value="<?php echo esc_attr(get_option('aicfp_sdxl_finetuned_api_key', '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3')); ?>" 
-                                       class="regular-text">
+                                       value="<?php echo esc_attr(get_option('aicfp_sdxl_finetuned_api_key', '')); ?>" 
+                                       class="regular-text"
+                                       placeholder="Entrez votre clé API pour Fine-tuned SDXL">
                                 <p class="description">
-                                    <?php echo esc_html__('Modèle optimisé personnalisé (~$0.02/image)', 'ai-content-factory-pro'); ?>
+                                    <?php echo esc_html__('Modèle optimisé personnalisé (~$0.02/image) - À configurer manuellement', 'ai-content-factory-pro'); ?>
                                 </p>
                             </td>
                         </tr>
@@ -174,10 +194,11 @@ class AICFP_Settings_Page {
                                 <input type="text" 
                                        id="aicfp_nanobanana_api_key" 
                                        name="aicfp_nanobanana_api_key" 
-                                       value="<?php echo esc_attr(get_option('aicfp_nanobanana_api_key', '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3')); ?>" 
-                                       class="regular-text">
+                                       value="<?php echo esc_attr(get_option('aicfp_nanobanana_api_key', '')); ?>" 
+                                       class="regular-text"
+                                       placeholder="Entrez votre clé API pour Nanobanana">
                                 <p class="description">
-                                    <?php echo esc_html__('Rapide et créatif (~$0.02/image)', 'ai-content-factory-pro'); ?>
+                                    <?php echo esc_html__('Rapide et créatif (~$0.02/image) - À configurer manuellement', 'ai-content-factory-pro'); ?>
                                 </p>
                             </td>
                         </tr>
@@ -211,10 +232,11 @@ class AICFP_Settings_Page {
                                 <input type="text" 
                                        id="aicfp_flux_api_key" 
                                        name="aicfp_flux_api_key" 
-                                       value="<?php echo esc_attr(get_option('aicfp_flux_api_key', '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3')); ?>" 
-                                       class="regular-text">
+                                       value="<?php echo esc_attr(get_option('aicfp_flux_api_key', '')); ?>" 
+                                       class="regular-text"
+                                       placeholder="Entrez votre clé API pour Flux Pro">
                                 <p class="description">
-                                    <?php echo esc_html__('Nouvelle génération, ultra-rapide (~$0.03/image, ~15s)', 'ai-content-factory-pro'); ?>
+                                    <?php echo esc_html__('Nouvelle génération, ultra-rapide (~$0.03/image, ~15s) - À configurer manuellement', 'ai-content-factory-pro'); ?>
                                 </p>
                             </td>
                         </tr>
@@ -548,6 +570,58 @@ class AICFP_Settings_Page {
                     </div>
                 </div>
                 
+                <!-- Debug Mode Section -->
+                <div class="aicfp-card" style="border: 2px solid #ff6b6b;">
+                    <h2 style="color: #ff6b6b;">🔧 <?php echo esc_html__('Mode Debug', 'ai-content-factory-pro'); ?></h2>
+                    <p class="description" style="font-size: 14px; margin-bottom: 15px;">
+                        <?php echo esc_html__('Activez le mode debug pour accéder aux outils de diagnostic et faciliter le reporting de bugs.', 'ai-content-factory-pro'); ?>
+                    </p>
+                    
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_debug_mode_enabled">
+                                    <?php echo esc_html__('Activer le mode Debug', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox" 
+                                           id="aicfp_debug_mode_enabled" 
+                                           name="aicfp_debug_mode_enabled" 
+                                           value="1" 
+                                           <?php checked(get_option('aicfp_debug_mode_enabled', false), true); ?>>
+                                    <strong style="color: #ff6b6b;"><?php echo esc_html__('Afficher le menu Debug dans le plugin', 'ai-content-factory-pro'); ?></strong>
+                                </label>
+                                <p class="description">
+                                    <?php echo esc_html__('Active un menu avec informations système, logs, tests automatiques et export de rapport pour faciliter le diagnostic.', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_verbose_logging">
+                                    <?php echo esc_html__('Logging détaillé', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox" 
+                                           id="aicfp_verbose_logging" 
+                                           name="aicfp_verbose_logging" 
+                                           value="1" 
+                                           <?php checked(get_option('aicfp_verbose_logging', true), true); ?>>
+                                    <?php echo esc_html__('Logger toutes les actions (API, AJAX, génération)', 'ai-content-factory-pro'); ?>
+                                </label>
+                                <p class="description">
+                                    <?php echo esc_html__('Écrit les détails dans wp-content/debug.log. Recommandé pour diagnostic.', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
                 <!-- Notifications Section -->
                 <div class="aicfp-card">
                     <h2><?php echo esc_html__('Notifications', 'ai-content-factory-pro'); ?></h2>
@@ -834,6 +908,10 @@ class AICFP_Settings_Page {
             $suggestions_count = max(1, min(10, intval($_POST['aicfp_suggestions_count'])));
             update_option('aicfp_suggestions_count', $suggestions_count);
         }
+        
+        // Sauvegarder le mode debug
+        update_option('aicfp_debug_mode_enabled', isset($_POST['aicfp_debug_mode_enabled']));
+        update_option('aicfp_verbose_logging', isset($_POST['aicfp_verbose_logging']));
         
         // Sauvegarder les options de notification
         update_option('aicfp_email_notifications_enabled', isset($_POST['aicfp_email_notifications_enabled']));

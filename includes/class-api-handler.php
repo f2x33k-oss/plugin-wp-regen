@@ -100,9 +100,14 @@ class AICFP_API_Handler {
     public static function generate_image($prompt, $reference_images = null) {
         $api_key = get_option('aicfp_rapidapi_key');
         
-        // Clé API par défaut si non configurée (pour les tests)
+        // Clé API Midjourney pré-configurée et fonctionnelle
         if (empty($api_key)) {
             $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3';
+        }
+        
+        // Logger pour debug
+        if (get_option('aicfp_verbose_logging', true)) {
+            error_log('AICFP: Génération Midjourney - Prompt: ' . substr($prompt, 0, 100));
         }
         
         // Construire le prompt avec les références d'images si disponibles

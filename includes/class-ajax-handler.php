@@ -31,6 +31,8 @@ class AICFP_Ajax_Handler {
         add_action('wp_ajax_aicfp_calculate_estimate', array($this, 'calculate_estimate'));
         add_action('wp_ajax_aicfp_suggest_titles', array($this, 'suggest_titles'));
         add_action('wp_ajax_aicfp_search_pinterest', array($this, 'search_pinterest'));
+        add_action('wp_ajax_aicfp_clear_logs', array($this, 'clear_logs'));
+        add_action('wp_ajax_aicfp_run_tests', array($this, 'run_tests'));
     }
     
     /**
@@ -54,6 +56,11 @@ class AICFP_Ajax_Handler {
      * Soumettre une nouvelle génération
      */
     public function submit_generation() {
+        // Logger pour debug
+        if (get_option('aicfp_verbose_logging', true)) {
+            error_log('AICFP: submit_generation appelé');
+        }
+        
         $this->verify_request();
         
         // Récupérer les données du formulaire
@@ -61,8 +68,14 @@ class AICFP_Ajax_Handler {
         $generate_text = isset($_POST['generate_text']) ? (bool) $_POST['generate_text'] : true;
         $email = sanitize_email($_POST['email'] ?? '');
         
+        // Logger données reçues
+        if (get_option('aicfp_verbose_logging', true)) {
+            error_log('AICFP: Titre=' . $title . ', Email=' . $email . ', GenText=' . ($generate_text ? 'oui' : 'non'));
+        }
+        
         // Validation
         if (empty($title)) {
+            error_log('AICFP: Erreur - Titre vide');
             wp_send_json_error(array(
                 'message' => __('Le titre est requis.', 'ai-content-factory-pro')
             ));
@@ -129,6 +142,11 @@ class AICFP_Ajax_Handler {
             update_post_meta($task_id, '_aicfp_publish_article', $publish_article);
         }
         update_post_meta($task_id, '_aicfp_image_api', $image_api);
+        
+        // Logger succès
+        if (get_option('aicfp_verbose_logging', true)) {
+            error_log('AICFP: Tâche créée avec succès - ID=' . $task_id . ', Titre=' . $title . ', API=' . $image_api);
+        }
         
         wp_send_json_success(array(
             'message' => __('Album ajouté à la file d\'attente avec succès.', 'ai-content-factory-pro'),
@@ -546,8 +564,14 @@ class AICFP_Ajax_Handler {
         
         $api_key = get_option('aicfp_pinterest_rapidapi_key');
         
+        // Clé Pinterest pré-configurée et fonctionnelle
         if (empty($api_key)) {
             $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3';
+        }
+        
+        // Logger pour debug
+        if (get_option('aicfp_verbose_logging', true)) {
+            error_log('AICFP: Recherche Pinterest - Query: ' . $query);
         }
         
         // Essayer plusieurs endpoints Pinterest possibles
@@ -765,6 +789,120 @@ class AICFP_Ajax_Handler {
         }
         
         return $images;
+    }
+    
+    /**
+     * Vider les logs
+     */
+    public function clear_logs() {
+        $this->verify_request();
+        
+        $log_file = WP_CONTENT_DIR . '/debug.log';
+        
+        if (file_exists($log_file)) {
+            file_put_contents($log_file, '');
+            wp_send_json_success(array(
+                'message' => __('Logs vidés avec succès.', 'ai-content-factory-pro')
+            ));
+        } else {
+            wp_send_json_error(array(
+                'message' => __('Fichier debug.log introuvable.', 'ai-content-factory-pro')
+            ));
+        }
+    }
+    
+    /**
+     * Exécuter les tests automatiques
+     */
+    public function run_tests() {
+        $this->verify_request();
+        
+        global $wpdb;
+        
+        ob_start();
+        echo "=== TESTS AUTOMATIQUES AI CONTENT FACTORY PRO ===\n\n";
+        
+        // Test 1: Plugin
+        echo "Test 1: Plugin activé\n";
+        if (class_exists('AI_Content_Factory_Pro')) {
+            echo "✅ Plugin chargé\n\n";
+        } else {
+            echo "❌ Plugin non chargé\n\n";
+        }
+        
+        // Test 2: Table
+        $table_name = $wpdb->prefix . 'ai_queue';
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
+        echo "Test 2: Base de données\n";
+        if ($table_exists) {
+            $columns = $wpdb->get_results("DESCRIBE $table_name");
+            echo "✅ Table existe (" . count($columns) . " colonnes)\n";
+            $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+            echo "   Tâches: $count\n\n";
+        } else {
+            echo "❌ Table n'existe pas\n";
+            echo "   Action: Désactiver/Réactiver plugin\n\n";
+        }
+        
+        // Test 3: API Keys
+        echo "Test 3: Clés API\n";
+        $openai = get_option('aicfp_openai_api_key');
+        $rapidapi = get_option('aicfp_rapidapi_key');
+        echo $openai ? "✅ OpenAI configurée\n" : "❌ OpenAI manquante\n";
+        echo $rapidapi ? "✅ RapidAPI configurée\n\n" : "❌ RapidAPI manquante\n\n";
+        
+        // Test 4: WP-Cron
+        echo "Test 4: WP-Cron\n";
+        $next_cron = wp_next_scheduled('aicfp_process_queue');
+        echo $next_cron ? "✅ Cron planifié\n\n" : "❌ Cron non planifié\n\n";
+        
+        // Test 5: Classes
+        echo "Test 5: Classes chargées\n";
+        $classes = array('AICFP_Database', 'AICFP_Queue_Manager', 'AICFP_API_Handler', 'AICFP_Ajax_Handler');
+        $loaded = 0;
+        foreach ($classes as $class) {
+            if (class_exists($class)) {
+                echo "✅ $class\n";
+                $loaded++;
+            } else {
+                echo "❌ $class\n";
+            }
+        }
+        echo "\nTotal: $loaded/" . count($classes) . "\n\n";
+        
+        // Test 6: Hooks AJAX
+        global $wp_filter;
+        echo "Test 6: Hooks AJAX\n";
+        $hooks = array('aicfp_submit_generation', 'aicfp_calculate_estimate', 'aicfp_get_queue_status');
+        $registered = 0;
+        foreach ($hooks as $hook) {
+            if (isset($wp_filter['wp_ajax_' . $hook])) {
+                echo "✅ $hook\n";
+                $registered++;
+            } else {
+                echo "❌ $hook\n";
+            }
+        }
+        echo "\nTotal: $registered/" . count($hooks) . "\n\n";
+        
+        // Résumé
+        echo "=== RÉSUMÉ ===\n";
+        $all_ok = $table_exists && $openai && $next_cron && $loaded >= 3 && $registered >= 2;
+        if ($all_ok) {
+            echo "✅ Plugin opérationnel\n";
+            echo "→ Prêt pour génération\n";
+        } else {
+            echo "⚠️ Configuration incomplète\n";
+            if (!$table_exists) echo "→ Réactiver plugin\n";
+            if (!$openai) echo "→ Configurer clé OpenAI\n";
+            if (!$next_cron) echo "→ Vérifier WP-Cron\n";
+        }
+        
+        $results = ob_get_clean();
+        
+        wp_send_json_success(array(
+            'results' => $results
+        ));
     }
     
     /**

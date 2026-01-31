@@ -86,5 +86,17 @@ class AICFP_Admin_Menu {
             'aicfp-settings',
             array('AICFP_Settings_Page', 'render')
         );
+        
+        // Sous-menu: Debug (si activé)
+        if (get_option('aicfp_debug_mode_enabled', false)) {
+            add_submenu_page(
+                'aicfp-albums-recettes',
+                __('Mode Debug', 'ai-content-factory-pro'),
+                __('🔧 Debug', 'ai-content-factory-pro'),
+                'manage_options',
+                'aicfp-debug',
+                array('AICFP_Debug_Page', 'render')
+            );
+        }
     }
 }
