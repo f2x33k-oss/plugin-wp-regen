@@ -1,0 +1,306 @@
+/**
+ * Styles pour AI Content Factory Pro
+ */
+
+/* Animations */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animations pour les dashicons en rotation */
+.dashicons-update-alt {
+    animation: spin 1s linear infinite;
+}
+
+/* Cartes communes */
+.aicfp-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    margin-bottom: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.aicfp-card-body {
+    padding: 20px;
+}
+
+/* Grille responsive */
+@media (max-width: 782px) {
+    .aicfp-stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .aicfp-estimator-content {
+        flex-direction: column;
+    }
+    
+    .aicfp-task-header {
+        flex-direction: column;
+    }
+    
+    .aicfp-task-actions {
+        flex-wrap: wrap;
+    }
+}
+
+/* Messages de résultat */
+.aicfp-result-success,
+.aicfp-result-error {
+    animation: fadeIn 0.3s ease;
+    border-radius: 4px;
+}
+
+/* Boutons */
+.button .dashicons {
+    vertical-align: middle;
+}
+
+.button-large .dashicons {
+    font-size: 20px;
+    height: 30px;
+}
+
+/* Tables responsives */
+@media (max-width: 782px) {
+    .form-table th,
+    .form-table td {
+        display: block;
+        width: 100%;
+        padding: 10px 0;
+    }
+    
+    .form-table th {
+        padding-bottom: 0;
+    }
+}
+
+/* Toggle switch amélioré */
+.aicfp-toggle {
+    user-select: none;
+}
+
+.aicfp-toggle input:focus + .aicfp-toggle-slider {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2271b1;
+}
+
+.aicfp-toggle input:disabled + .aicfp-toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Barre de progression améliorée */
+.aicfp-progress-fill {
+    position: relative;
+    overflow: hidden;
+}
+
+.aicfp-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, .2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, .2) 50%,
+        rgba(255, 255, 255, .2) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 50px 50px;
+    animation: move 2s linear infinite;
+}
+
+@keyframes move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+
+/* États de chargement */
+.aicfp-loading {
+    position: relative;
+}
+
+.aicfp-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    margin-left: -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #2271b1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Badges de statut avec icônes */
+.aicfp-task-status::before {
+    content: '●';
+    margin-right: 5px;
+}
+
+.aicfp-status-pending::before {
+    content: '⏱';
+}
+
+.aicfp-status-processing::before {
+    content: '⚙';
+}
+
+.aicfp-status-completed::before {
+    content: '✓';
+}
+
+.aicfp-status-paused::before {
+    content: '⏸';
+}
+
+.aicfp-status-cancelled::before {
+    content: '✕';
+}
+
+/* Tooltips */
+[data-tooltip] {
+    position: relative;
+    cursor: help;
+}
+
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 12px;
+    background: #1d2327;
+    color: #fff;
+    font-size: 12px;
+    white-space: nowrap;
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    margin-bottom: 5px;
+    z-index: 1000;
+}
+
+[data-tooltip]:hover::after {
+    opacity: 1;
+}
+
+/* Amélioration de l'accessibilité */
+.aicfp-task-actions .button:focus,
+.button:focus {
+    outline: 2px solid #2271b1;
+    outline-offset: 2px;
+}
+
+/* Impression */
+@media print {
+    .aicfp-task-actions,
+    .aicfp-card-header .button,
+    .aicfp-toggle {
+        display: none;
+    }
+}
+
+/* Mode sombre (si WordPress en mode sombre) */
+@media (prefers-color-scheme: dark) {
+    .aicfp-card {
+        background: #1d2327;
+        border-color: #3c434a;
+    }
+    
+    .aicfp-stat-card {
+        background: #1d2327;
+        border-color: #3c434a;
+    }
+    
+    .aicfp-task-item {
+        border-color: #3c434a;
+    }
+    
+    .aicfp-estimator {
+        background: #2c3338;
+        border-color: #3c434a;
+    }
+}
+
+/* Transitions fluides */
+.aicfp-task-item,
+.aicfp-stat-card,
+.aicfp-card {
+    transition: all 0.2s ease;
+}
+
+.aicfp-task-item:hover {
+    background: #f9f9f9;
+}
+
+.aicfp-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,.1);
+}
+
+/* Scrollbar personnalisée */
+.aicfp-prompts-log::-webkit-scrollbar,
+.aicfp-error-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.aicfp-prompts-log::-webkit-scrollbar-track,
+.aicfp-error-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.aicfp-prompts-log::-webkit-scrollbar-thumb,
+.aicfp-error-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.aicfp-prompts-log::-webkit-scrollbar-thumb:hover,
+.aicfp-error-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* États vides améliorés */
+.aicfp-no-tasks,
+.aicfp-loading {
+    font-size: 14px;
+    font-style: italic;
+}
+
+.aicfp-no-tasks::before {
+    content: '📋';
+    display: block;
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+/* Optimisation des performances */
+.aicfp-images-grid img {
+    will-change: transform;
+}
+
+.aicfp-progress-fill {
+    will-change: width;
+}
