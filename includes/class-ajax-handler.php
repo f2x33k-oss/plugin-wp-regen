@@ -66,7 +66,20 @@ class AICFP_Ajax_Handler {
         // Récupérer les données du formulaire
         $title = sanitize_text_field($_POST['title'] ?? '');
         $generate_text = isset($_POST['generate_text']) ? (bool) $_POST['generate_text'] : true;
-        $email = sanitize_email($_POST['email'] ?? '');
+        
+        // Récupérer l'email (depuis utilisateur WordPress ou email manuel)
+        $email = '';
+        if (isset($_POST['recipient_user']) && !empty($_POST['recipient_user'])) {
+            $user_id = intval($_POST['recipient_user']);
+            $user = get_userdata($user_id);
+            if ($user) {
+                $email = $user->user_email;
+            }
+        } elseif (isset($_POST['email_manual']) && !empty($_POST['email_manual'])) {
+            $email = sanitize_email($_POST['email_manual']);
+        } else {
+            $email = sanitize_email($_POST['email'] ?? '');
+        }
         
         // Logger données reçues
         if (get_option('aicfp_verbose_logging', true)) {
@@ -82,6 +95,7 @@ class AICFP_Ajax_Handler {
         }
         
         if (empty($email) || !is_email($email)) {
+            error_log('AICFP: Erreur - Email invalide: ' . $email);
             wp_send_json_error(array(
                 'message' => __('Une adresse email valide est requise.', 'ai-content-factory-pro')
             ));

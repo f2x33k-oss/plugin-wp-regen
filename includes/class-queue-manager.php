@@ -72,6 +72,9 @@ class AICFP_Queue_Manager {
             }
         }
         
+        // Envoyer l'email de démarrage
+        AICFP_Email_Handler::send_start_email($task);
+        
         // Continuer le traitement
         self::process_task($task->id);
     }
@@ -213,6 +216,34 @@ class AICFP_Queue_Manager {
             }
         }
         
+        // Upload vers Google Drive si activé
+        $google_drive_url = null;
+        $google_doc_url = null;
+        
+        if (get_option('aicfp_use_google_drive', false) && !empty($generated_images)) {
+            // Renommer les images intelligemment avec titres de recettes
+            $renamed_images = self::prepare_images_with_titles($generated_images, $generated_content);
+            
+            // Upload vers Google Drive
+            $drive_result = AICFP_Google_Services::upload_images_to_drive($task->title, $renamed_images);
+            
+            if (!is_wp_error($drive_result)) {
+                $google_drive_url = $drive_result['folder_url'];
+                update_post_meta($task->id, '_aicfp_google_drive_url', $google_drive_url);
+                update_post_meta($task->id, '_aicfp_google_drive_files', $drive_result['files']);
+            }
+        }
+        
+        // Créer Google Doc si activé
+        if (get_option('aicfp_create_google_docs', true) && $task->generate_text && !empty($generated_content)) {
+            $doc_url = AICFP_Google_Services::create_google_doc($task->title, $generated_content);
+            
+            if (!is_wp_error($doc_url)) {
+                $google_doc_url = $doc_url;
+                update_post_meta($task->id, '_aicfp_google_doc_url', $google_doc_url);
+            }
+        }
+        
         // Mettre à jour la tâche
         AICFP_Database::update_task($task->id, array(
             'status' => 'completed',
@@ -223,6 +254,42 @@ class AICFP_Queue_Manager {
         
         // Envoyer l'email de notification
         AICFP_Email_Handler::send_completion_email($task);
+    }
+    
+    /**
+     * Préparer les images avec titres de recettes pour renommage
+     */
+    private static function prepare_images_with_titles($generated_images, $generated_content) {
+        $renamed_images = array();
+        
+        foreach ($generated_images as $index => $image) {
+            $recipe_title = '';
+            
+            // Essayer d'extraire le titre de la recette correspondante
+            if (isset($generated_content[$index])) {
+                $content = $generated_content[$index]['content'];
+                $lines = explode("\n", $content);
+                
+                // Chercher le titre dans les premières lignes
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (!empty($line) && !str_starts_with($line, '👥') && !str_starts_with($line, '⏱️')) {
+                        $recipe_title = preg_replace('/^[^\w\s]+\s*/', '', $line);
+                        $recipe_title = trim(str_replace(['**', '__', '🍽️'], '', $recipe_title));
+                        if (!empty($recipe_title) && strlen($recipe_title) > 3) {
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Ajouter le titre de la recette à l'image
+            $renamed_images[] = array_merge($image, array(
+                'recipe_title' => $recipe_title
+            ));
+        }
+        
+        return $renamed_images;
     }
     
     /**

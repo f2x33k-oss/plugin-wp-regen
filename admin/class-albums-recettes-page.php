@@ -251,19 +251,51 @@ class AICFP_Albums_Recettes_Page {
                                         </div>
                                     </div>
                                     
-                                    <!-- Email -->
+                                    <!-- Email / Sélection utilisateur -->
                                     <div class="aicfp-form-group">
-                                        <label for="aicfp_email" class="aicfp-label">
-                                            <?php echo esc_html__('Email de livraison', 'ai-content-factory-pro'); ?>
+                                        <label for="aicfp_user_select" class="aicfp-label">
+                                            <?php echo esc_html__('Destinataire', 'ai-content-factory-pro'); ?>
                                             <span class="aicfp-required">*</span>
                                         </label>
-                                        <input type="email" 
-                                               id="aicfp_email" 
-                                               name="email" 
-                                               class="aicfp-input" 
-                                               required
-                                               value="<?php echo esc_attr(wp_get_current_user()->user_email); ?>">
-                                        <p class="aicfp-hint"><?php echo esc_html__('Vous recevrez un email avec les résultats', 'ai-content-factory-pro'); ?></p>
+                                        
+                                        <div class="aicfp-recipient-selector">
+                                            <div class="aicfp-tabs-minimal" style="margin-bottom: 15px;">
+                                                <button type="button" class="aicfp-tab-btn active" data-tab="user-select">
+                                                    <span class="dashicons dashicons-admin-users"></span>
+                                                    <?php echo esc_html__('Utilisateur WordPress', 'ai-content-factory-pro'); ?>
+                                                </button>
+                                                <button type="button" class="aicfp-tab-btn" data-tab="email-manual">
+                                                    <span class="dashicons dashicons-email"></span>
+                                                    <?php echo esc_html__('Email manuel', 'ai-content-factory-pro'); ?>
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="aicfp-tab-content active" id="tab-user-select">
+                                                <?php
+                                                $users = get_users(array('orderby' => 'display_name'));
+                                                $current_user_id = get_current_user_id();
+                                                ?>
+                                                <select id="aicfp_user_select" name="recipient_user" class="aicfp-input">
+                                                    <?php foreach ($users as $user): ?>
+                                                        <option value="<?php echo esc_attr($user->ID); ?>" 
+                                                                data-email="<?php echo esc_attr($user->user_email); ?>"
+                                                                <?php selected($user->ID, $current_user_id); ?>>
+                                                            <?php echo esc_html($user->display_name); ?> (<?php echo esc_html($user->user_email); ?>)
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <p class="aicfp-hint"><?php echo esc_html__('Sélectionnez l\'utilisateur qui recevra les résultats', 'ai-content-factory-pro'); ?></p>
+                                            </div>
+                                            
+                                            <div class="aicfp-tab-content" id="tab-email-manual">
+                                                <input type="email" 
+                                                       id="aicfp_email" 
+                                                       name="email_manual" 
+                                                       class="aicfp-input" 
+                                                       placeholder="ex: destinataire@example.com">
+                                                <p class="aicfp-hint"><?php echo esc_html__('Ou entrez manuellement une adresse email', 'ai-content-factory-pro'); ?></p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 

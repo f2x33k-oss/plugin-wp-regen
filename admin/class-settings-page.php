@@ -686,6 +686,107 @@ class AICFP_Settings_Page {
                     </table>
                 </div>
                 
+                <!-- Google Services Section -->
+                <div class="aicfp-card">
+                    <h2>🔗 <?php echo esc_html__('Services Google', 'ai-content-factory-pro'); ?></h2>
+                    <p class="description" style="font-size: 14px; margin-bottom: 15px;">
+                        <?php echo esc_html__('Configurez Gmail API et Google Drive pour améliorer l\'envoi des emails et le stockage des fichiers.', 'ai-content-factory-pro'); ?>
+                    </p>
+                    
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_use_gmail_api">
+                                    <?php echo esc_html__('Utiliser Gmail API', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox" 
+                                           id="aicfp_use_gmail_api" 
+                                           name="aicfp_use_gmail_api" 
+                                           value="1" 
+                                           <?php checked(get_option('aicfp_use_gmail_api', false), true); ?>>
+                                    <?php echo esc_html__('Envoyer via Gmail API au lieu de SMTP', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </td>
+                        </tr>
+                        
+                        <tr class="aicfp-gmail-field">
+                            <th scope="row">
+                                <label for="aicfp_gmail_api_key">
+                                    <?php echo esc_html__('Token Gmail API', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <textarea id="aicfp_gmail_api_key" 
+                                          name="aicfp_gmail_api_key" 
+                                          rows="4" 
+                                          class="large-text code"><?php echo esc_textarea(get_option('aicfp_gmail_api_key', '')); ?></textarea>
+                                <p class="description">
+                                    <a href="https://console.cloud.google.com/" target="_blank"><?php echo esc_html__('Console Google Cloud', 'ai-content-factory-pro'); ?></a>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_use_google_drive">
+                                    <?php echo esc_html__('Activer Google Drive', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox" 
+                                           id="aicfp_use_google_drive" 
+                                           name="aicfp_use_google_drive" 
+                                           value="1" 
+                                           <?php checked(get_option('aicfp_use_google_drive', false), true); ?>>
+                                    <?php echo esc_html__('Uploader automatiquement vers Google Drive', 'ai-content-factory-pro'); ?>
+                                </label>
+                                <p class="description">
+                                    <?php echo esc_html__('Images renommées intelligemment: 1-gratin-dauphinois.jpg, 2-poulet-roti.jpg, etc.', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr class="aicfp-drive-field">
+                            <th scope="row">
+                                <label for="aicfp_google_api_key">
+                                    <?php echo esc_html__('Token Google API', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <textarea id="aicfp_google_api_key" 
+                                          name="aicfp_google_api_key" 
+                                          rows="4" 
+                                          class="large-text code"><?php echo esc_textarea(get_option('aicfp_google_api_key', '')); ?></textarea>
+                                <p class="description">
+                                    <?php echo esc_html__('Token OAuth2 pour Drive et Docs APIs.', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr class="aicfp-drive-field">
+                            <th scope="row">
+                                <label for="aicfp_create_google_docs">
+                                    <?php echo esc_html__('Créer Google Docs', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox" 
+                                           id="aicfp_create_google_docs" 
+                                           name="aicfp_create_google_docs" 
+                                           value="1" 
+                                           <?php checked(get_option('aicfp_create_google_docs', true), true); ?>>
+                                    <?php echo esc_html__('Créer un Google Doc avec tous les textes de recettes', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
                 <!-- SMTP Settings Section -->
                 <div class="aicfp-card">
                     <h2><?php echo esc_html__('Paramètres SMTP', 'ai-content-factory-pro'); ?></h2>
@@ -856,8 +957,29 @@ class AICFP_Settings_Page {
                 }
             }
             
+            function toggleGmailFields() {
+                if ($('#aicfp_use_gmail_api').is(':checked')) {
+                    $('.aicfp-gmail-field').show();
+                } else {
+                    $('.aicfp-gmail-field').hide();
+                }
+            }
+            
+            function toggleDriveFields() {
+                if ($('#aicfp_use_google_drive').is(':checked')) {
+                    $('.aicfp-drive-field').show();
+                } else {
+                    $('.aicfp-drive-field').hide();
+                }
+            }
+            
             toggleSMTPFields();
+            toggleGmailFields();
+            toggleDriveFields();
+            
             $('#aicfp_smtp_enabled').on('change', toggleSMTPFields);
+            $('#aicfp_use_gmail_api').on('change', toggleGmailFields);
+            $('#aicfp_use_google_drive').on('change', toggleDriveFields);
         });
         </script>
         <?php
@@ -912,6 +1034,27 @@ class AICFP_Settings_Page {
         // Sauvegarder le mode debug
         update_option('aicfp_debug_mode_enabled', isset($_POST['aicfp_debug_mode_enabled']));
         update_option('aicfp_verbose_logging', isset($_POST['aicfp_verbose_logging']));
+        
+        // Sauvegarder les paramètres Google
+        update_option('aicfp_use_gmail_api', isset($_POST['aicfp_use_gmail_api']));
+        update_option('aicfp_use_google_drive', isset($_POST['aicfp_use_google_drive']));
+        update_option('aicfp_create_google_docs', isset($_POST['aicfp_create_google_docs']));
+        
+        if (isset($_POST['aicfp_gmail_api_key'])) {
+            update_option('aicfp_gmail_api_key', wp_unslash($_POST['aicfp_gmail_api_key']));
+        }
+        
+        if (isset($_POST['aicfp_google_api_key'])) {
+            update_option('aicfp_google_api_key', wp_unslash($_POST['aicfp_google_api_key']));
+        }
+        
+        if (isset($_POST['aicfp_google_client_email'])) {
+            update_option('aicfp_google_client_email', sanitize_email($_POST['aicfp_google_client_email']));
+        }
+        
+        if (isset($_POST['aicfp_google_drive_folder'])) {
+            update_option('aicfp_google_drive_folder', sanitize_text_field($_POST['aicfp_google_drive_folder']));
+        }
         
         // Sauvegarder les options de notification
         update_option('aicfp_email_notifications_enabled', isset($_POST['aicfp_email_notifications_enabled']));

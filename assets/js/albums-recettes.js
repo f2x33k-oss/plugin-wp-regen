@@ -369,7 +369,15 @@
         
         // Validation
         const title = $('#aicfp_title').val().trim();
-        const email = $('#aicfp_email').val().trim();
+        
+        // Récupérer l'email (depuis utilisateur ou manuel)
+        let email = '';
+        if ($('#tab-user-select').hasClass('active')) {
+            const $selected = $('#aicfp_user_select option:selected');
+            email = $selected.data('email');
+        } else {
+            email = $('#aicfp_email').val().trim();
+        }
         
         if (!title) {
             showNotification('Le titre est requis', 'error');
@@ -377,7 +385,7 @@
         }
         
         if (!email) {
-            showNotification('L\'email est requis', 'error');
+            showNotification('Veuillez sélectionner un utilisateur ou entrer un email', 'error');
             return;
         }
         
