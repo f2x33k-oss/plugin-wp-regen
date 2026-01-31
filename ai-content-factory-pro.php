@@ -67,7 +67,9 @@ class AI_Content_Factory_Pro {
         // Pages d'administration
         require_once AICFP_PLUGIN_DIR . 'admin/class-admin-menu.php';
         require_once AICFP_PLUGIN_DIR . 'admin/class-settings-page.php';
-        require_once AICFP_PLUGIN_DIR . 'admin/class-generate-page.php';
+        require_once AICFP_PLUGIN_DIR . 'admin/class-albums-recettes-page.php';
+        require_once AICFP_PLUGIN_DIR . 'admin/class-albums-idees-page.php';
+        require_once AICFP_PLUGIN_DIR . 'admin/class-videos-page.php';
         require_once AICFP_PLUGIN_DIR . 'admin/class-instances-page.php';
         require_once AICFP_PLUGIN_DIR . 'admin/class-meta-box.php';
         

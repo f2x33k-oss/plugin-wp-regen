@@ -84,6 +84,70 @@ class AICFP_Settings_Page {
                     </table>
                 </div>
                 
+                <!-- Notifications Section -->
+                <div class="aicfp-card">
+                    <h2><?php echo esc_html__('Notifications', 'ai-content-factory-pro'); ?></h2>
+                    
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_email_notifications_enabled">
+                                    <?php echo esc_html__('Notifications par email', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox" 
+                                           id="aicfp_email_notifications_enabled" 
+                                           name="aicfp_email_notifications_enabled" 
+                                           value="1" 
+                                           <?php checked(get_option('aicfp_email_notifications_enabled', true), true); ?>>
+                                    <?php echo esc_html__('Envoyer un email quand un album est prêt', 'ai-content-factory-pro'); ?>
+                                </label>
+                                <p class="description">
+                                    <?php echo esc_html__('Vous recevrez un email avec le lien de téléchargement une fois la génération terminée.', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_notification_email">
+                                    <?php echo esc_html__('Email de notification par défaut', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="email" 
+                                       id="aicfp_notification_email" 
+                                       name="aicfp_notification_email" 
+                                       value="<?php echo esc_attr(get_option('aicfp_notification_email', get_option('admin_email'))); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <?php echo esc_html__('Email utilisé par défaut pour les notifications (peut être modifié pour chaque album).', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_notify_errors">
+                                    <?php echo esc_html__('Notifier les erreurs', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox" 
+                                           id="aicfp_notify_errors" 
+                                           name="aicfp_notify_errors" 
+                                           value="1" 
+                                           <?php checked(get_option('aicfp_notify_errors', true), true); ?>>
+                                    <?php echo esc_html__('Envoyer un email en cas d\'erreur pendant la génération', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
                 <!-- SMTP Settings Section -->
                 <div class="aicfp-card">
                     <h2><?php echo esc_html__('Paramètres SMTP', 'ai-content-factory-pro'); ?></h2>
@@ -273,6 +337,15 @@ class AICFP_Settings_Page {
         if (isset($_POST['aicfp_rapidapi_key'])) {
             update_option('aicfp_rapidapi_key', sanitize_text_field($_POST['aicfp_rapidapi_key']));
         }
+        
+        // Sauvegarder les options de notification
+        update_option('aicfp_email_notifications_enabled', isset($_POST['aicfp_email_notifications_enabled']));
+        
+        if (isset($_POST['aicfp_notification_email'])) {
+            update_option('aicfp_notification_email', sanitize_email($_POST['aicfp_notification_email']));
+        }
+        
+        update_option('aicfp_notify_errors', isset($_POST['aicfp_notify_errors']));
         
         // Sauvegarder les paramètres SMTP
         update_option('aicfp_smtp_enabled', isset($_POST['aicfp_smtp_enabled']));

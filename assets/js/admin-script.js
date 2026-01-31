@@ -21,9 +21,17 @@
         }
         
         // Calculer l'estimation en temps réel
-        $('#aicfp_title, #aicfp_generate_text').on('change keyup', debounce(function() {
+        $('#aicfp_title').on('change keyup', debounce(function() {
             calculateEstimate();
         }, 500));
+        
+        $('#aicfp_generate_text').on('change', function() {
+            calculateEstimate();
+        });
+        
+        $('#aicfp_reference_zip').on('change', function() {
+            calculateEstimate();
+        });
         
         // Calcul initial
         calculateEstimate();

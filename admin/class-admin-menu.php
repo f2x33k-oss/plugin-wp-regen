@@ -31,25 +31,45 @@ class AICFP_Admin_Menu {
             __('AI Content Factory Pro', 'ai-content-factory-pro'),
             __('AI Content Factory', 'ai-content-factory-pro'),
             'manage_options',
-            'aicfp-generate',
-            array('AICFP_Generate_Page', 'render'),
+            'aicfp-albums-recettes',
+            array('AICFP_Albums_Recettes_Page', 'render'),
             'dashicons-admin-generic',
             30
         );
         
-        // Sous-menu: Générer (page par défaut)
+        // Sous-menu: Albums Recettes (page par défaut)
         add_submenu_page(
-            'aicfp-generate',
-            __('Générer du contenu', 'ai-content-factory-pro'),
-            __('Générer', 'ai-content-factory-pro'),
+            'aicfp-albums-recettes',
+            __('Albums Recettes', 'ai-content-factory-pro'),
+            __('Albums Recettes', 'ai-content-factory-pro'),
             'manage_options',
-            'aicfp-generate',
-            array('AICFP_Generate_Page', 'render')
+            'aicfp-albums-recettes',
+            array('AICFP_Albums_Recettes_Page', 'render')
+        );
+        
+        // Sous-menu: Albums Idées
+        add_submenu_page(
+            'aicfp-albums-recettes',
+            __('Albums Idées', 'ai-content-factory-pro'),
+            __('Albums Idées', 'ai-content-factory-pro'),
+            'manage_options',
+            'aicfp-albums-idees',
+            array('AICFP_Albums_Idees_Page', 'render')
+        );
+        
+        // Sous-menu: Vidéos
+        add_submenu_page(
+            'aicfp-albums-recettes',
+            __('Génération de Vidéos IA', 'ai-content-factory-pro'),
+            __('Vidéos', 'ai-content-factory-pro'),
+            'manage_options',
+            'aicfp-videos',
+            array('AICFP_Videos_Page', 'render')
         );
         
         // Sous-menu: Instances
         add_submenu_page(
-            'aicfp-generate',
+            'aicfp-albums-recettes',
             __('File d\'attente', 'ai-content-factory-pro'),
             __('Instances', 'ai-content-factory-pro'),
             'manage_options',
@@ -59,7 +79,7 @@ class AICFP_Admin_Menu {
         
         // Sous-menu: Réglages
         add_submenu_page(
-            'aicfp-generate',
+            'aicfp-albums-recettes',
             __('Réglages', 'ai-content-factory-pro'),
             __('Réglages', 'ai-content-factory-pro'),
             'manage_options',

@@ -1,6 +1,6 @@
 <?php
 /**
- * Page de génération
+ * Page Albums Recettes
  *
  * @package AI_Content_Factory_Pro
  */
@@ -11,9 +11,9 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Classe de la page de génération
+ * Classe de la page Albums Recettes
  */
-class AICFP_Generate_Page {
+class AICFP_Albums_Recettes_Page {
     
     /**
      * Render la page
@@ -25,8 +25,8 @@ class AICFP_Generate_Page {
         }
         
         ?>
-        <div class="wrap aicfp-generate-page">
-            <h1><?php echo esc_html__('Générer du Contenu - AI Content Factory Pro', 'ai-content-factory-pro'); ?></h1>
+        <div class="wrap aicfp-albums-recettes-page">
+            <h1><?php echo esc_html__('Albums Recettes - AI Content Factory Pro', 'ai-content-factory-pro'); ?></h1>
             
             <div class="aicfp-card">
                 <form id="aicfp-generate-form" enctype="multipart/form-data">
@@ -79,18 +79,47 @@ class AICFP_Generate_Page {
                         
                         <tr>
                             <th scope="row">
-                                <label for="aicfp_reference_zip">
+                                <label>
                                     <?php echo esc_html__('Images de référence', 'ai-content-factory-pro'); ?>
                                 </label>
                             </th>
                             <td>
-                                <input type="file" 
-                                       id="aicfp_reference_zip" 
-                                       name="reference_zip" 
-                                       accept=".zip">
-                                <p class="description">
-                                    <?php echo esc_html__('Uploadez un fichier ZIP contenant des images à utiliser comme références (--sref) pour Midjourney.', 'ai-content-factory-pro'); ?>
-                                </p>
+                                <div class="aicfp-reference-images-container">
+                                    <!-- Option 1 : Upload ZIP -->
+                                    <div class="aicfp-upload-option">
+                                        <h4><?php echo esc_html__('Option 1 : Upload ZIP', 'ai-content-factory-pro'); ?></h4>
+                                        <input type="file" 
+                                               id="aicfp_reference_zip" 
+                                               name="reference_zip" 
+                                               accept=".zip"
+                                               class="aicfp-zip-upload">
+                                        <p class="description">
+                                            <?php echo esc_html__('Uploadez un fichier ZIP contenant toutes les images de référence.', 'ai-content-factory-pro'); ?>
+                                        </p>
+                                    </div>
+                                    
+                                    <!-- Option 2 : Images individuelles -->
+                                    <div class="aicfp-upload-option">
+                                        <h4><?php echo esc_html__('Option 2 : Images individuelles', 'ai-content-factory-pro'); ?></h4>
+                                        <div id="aicfp-individual-images">
+                                            <div class="aicfp-image-upload-row">
+                                                <input type="file" 
+                                                       name="reference_images[]" 
+                                                       accept="image/*"
+                                                       class="aicfp-single-image">
+                                                <div class="aicfp-image-preview"></div>
+                                                <button type="button" class="button aicfp-remove-image" style="display:none;">×</button>
+                                            </div>
+                                        </div>
+                                        <button type="button" id="aicfp-add-image-field" class="button button-secondary">
+                                            <span class="dashicons dashicons-plus-alt"></span>
+                                            <?php echo esc_html__('Ajouter une image', 'ai-content-factory-pro'); ?>
+                                        </button>
+                                        <p class="description">
+                                            <?php echo esc_html__('Ajoutez jusqu\'à 10 images de référence pour le style Midjourney (--sref).', 'ai-content-factory-pro'); ?>
+                                        </p>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         
@@ -259,7 +288,149 @@ class AICFP_Generate_Page {
                 padding: 15px;
                 margin-top: 20px;
             }
+            
+            /* Images de référence */
+            .aicfp-reference-images-container {
+                display: flex;
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .aicfp-upload-option {
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                background: #f9f9f9;
+            }
+            
+            .aicfp-upload-option h4 {
+                margin-top: 0;
+                color: #1d2327;
+            }
+            
+            #aicfp-individual-images {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .aicfp-image-upload-row {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                padding: 15px;
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            }
+            
+            .aicfp-single-image {
+                flex: 1;
+            }
+            
+            .aicfp-image-preview {
+                width: 100px;
+                height: 100px;
+                border: 2px dashed #ddd;
+                border-radius: 5px;
+                overflow: hidden;
+                display: none;
+                background-size: cover;
+                background-position: center;
+                background-color: #f5f5f5;
+            }
+            
+            .aicfp-image-preview.has-image {
+                display: block;
+                border-style: solid;
+                border-color: #2271b1;
+            }
+            
+            .aicfp-remove-image {
+                background: #d63638;
+                color: white;
+                border: none;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                cursor: pointer;
+                font-size: 20px;
+                line-height: 1;
+            }
+            
+            .aicfp-remove-image:hover {
+                background: #a02020;
+            }
+            
+            #aicfp-add-image-field .dashicons {
+                line-height: 28px;
+            }
         </style>
+        
+        <script>
+        jQuery(document).ready(function($) {
+            let imageCount = 1;
+            const maxImages = 10;
+            
+            // Ajouter un nouveau champ d'image
+            $('#aicfp-add-image-field').on('click', function() {
+                if ($('.aicfp-image-upload-row').length >= maxImages) {
+                    alert('<?php echo esc_js(__("Vous pouvez ajouter maximum 10 images de référence.", "ai-content-factory-pro")); ?>');
+                    return;
+                }
+                
+                const newRow = `
+                    <div class="aicfp-image-upload-row">
+                        <input type="file" 
+                               name="reference_images[]" 
+                               accept="image/*"
+                               class="aicfp-single-image">
+                        <div class="aicfp-image-preview"></div>
+                        <button type="button" class="button aicfp-remove-image">×</button>
+                    </div>
+                `;
+                
+                $('#aicfp-individual-images').append(newRow);
+                imageCount++;
+            });
+            
+            // Supprimer une ligne d'image
+            $(document).on('click', '.aicfp-remove-image', function() {
+                if ($('.aicfp-image-upload-row').length > 1) {
+                    $(this).closest('.aicfp-image-upload-row').remove();
+                    imageCount--;
+                } else {
+                    // Réinitialiser la première ligne
+                    $(this).closest('.aicfp-image-upload-row').find('.aicfp-single-image').val('');
+                    $(this).closest('.aicfp-image-upload-row').find('.aicfp-image-preview').removeClass('has-image').css('background-image', '');
+                    $(this).hide();
+                }
+            });
+            
+            // Prévisualisation des images
+            $(document).on('change', '.aicfp-single-image', function() {
+                const file = this.files[0];
+                const $preview = $(this).siblings('.aicfp-image-preview');
+                const $removeBtn = $(this).siblings('.aicfp-remove-image');
+                
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        $preview.css('background-image', 'url(' + e.target.result + ')');
+                        $preview.addClass('has-image');
+                        $removeBtn.show();
+                    }
+                    
+                    reader.readAsDataURL(file);
+                } else {
+                    $preview.removeClass('has-image').css('background-image', '');
+                    $removeBtn.hide();
+                }
+            });
+        });
+        </script>
         <?php
     }
 }
