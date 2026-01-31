@@ -398,18 +398,15 @@
                 if (response.success) {
                     showNotification('✅ ' + response.data.message, 'success');
                     
-                    // Réinitialiser le formulaire
-                    $form[0].reset();
-                    selectedPinterestImages = [];
-                    $('#aicfp-pinterest-badge').remove();
-                    $('.aicfp-image-preview').removeClass('has-image').css('background-image', '');
-                    $('.aicfp-remove-image').hide();
-                    calculateEstimate();
-                    
-                    // Rediriger vers Instances
+                    // Message de redirection
                     setTimeout(function() {
-                        window.location.href = 'admin.php?page=aicfp-instances';
-                    }, 2000);
+                        showNotification('🔄 Redirection vers le suivi des générations...', 'info');
+                    }, 1500);
+                    
+                    // Rediriger vers Instances avec focus sur la nouvelle tâche
+                    setTimeout(function() {
+                        window.location.href = 'admin.php?page=aicfp-instances&highlight=' + response.data.task_id;
+                    }, 2500);
                 } else {
                     showNotification('❌ ' + response.data.message, 'error');
                 }

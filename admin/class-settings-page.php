@@ -341,6 +341,213 @@ class AICFP_Settings_Page {
                     </table>
                 </div>
                 
+                <!-- Video Generation APIs Section -->
+                <div class="aicfp-card">
+                    <h2><?php echo esc_html__('🎬 Moteurs de génération vidéo', 'ai-content-factory-pro'); ?></h2>
+                    <p class="description" style="font-size: 14px; margin-bottom: 15px;">
+                        <?php echo esc_html__('Configurez les clés API pour les moteurs de génération vidéo IA. Nécessaire pour le module Vidéos.', 'ai-content-factory-pro'); ?>
+                    </p>
+                    
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_google_veo_api_key">
+                                    <?php echo esc_html__('Clé Google VEO', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_google_veo_api_key" 
+                                       name="aicfp_google_veo_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_google_veo_api_key', '')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <strong style="color: #2271b1;">⭐ RECOMMANDÉ</strong> - Google VEO 2/3, haute qualité, jusqu'à 2 min (~$0.50/vidéo)
+                                    <a href="https://deepmind.google/technologies/veo/" target="_blank"><?php echo esc_html__('En savoir plus', 'ai-content-factory-pro'); ?></a>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_sora_api_key">
+                                    <?php echo esc_html__('Clé OpenAI Sora', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_sora_api_key" 
+                                       name="aicfp_sora_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_sora_api_key', '')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <?php echo esc_html__('Sora d\'OpenAI, qualité exceptionnelle, jusqu\'à 1 min (~$1.00/vidéo)', 'ai-content-factory-pro'); ?>
+                                    <a href="https://openai.com/sora" target="_blank"><?php echo esc_html__('Obtenir accès', 'ai-content-factory-pro'); ?></a>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_runway_api_key">
+                                    <?php echo esc_html__('Clé RunwayML', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_runway_api_key" 
+                                       name="aicfp_runway_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_runway_api_key', '')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <?php echo esc_html__('RunwayML Gen-2/Gen-3, rapide et créatif, 10s max (~$0.60/vidéo)', 'ai-content-factory-pro'); ?>
+                                    <a href="https://runwayml.com/" target="_blank"><?php echo esc_html__('Obtenir une clé', 'ai-content-factory-pro'); ?></a>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_pika_api_key">
+                                    <?php echo esc_html__('Clé Pika Labs', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_pika_api_key" 
+                                       name="aicfp_pika_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_pika_api_key', '')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <?php echo esc_html__('Pika Labs 1.5, animations fluides, 3s max (~$0.40/vidéo)', 'ai-content-factory-pro'); ?>
+                                    <a href="https://pika.art/" target="_blank"><?php echo esc_html__('Obtenir accès', 'ai-content-factory-pro'); ?></a>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_luma_api_key">
+                                    <?php echo esc_html__('Clé Luma AI', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_luma_api_key" 
+                                       name="aicfp_luma_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_luma_api_key', '')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <?php echo esc_html__('Luma Dream Machine, vidéos immersives, 5s max (~$0.50/vidéo)', 'ai-content-factory-pro'); ?>
+                                    <a href="https://lumalabs.ai/" target="_blank"><?php echo esc_html__('Obtenir une clé', 'ai-content-factory-pro'); ?></a>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_kling_api_key">
+                                    <?php echo esc_html__('Clé Kling AI', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_kling_api_key" 
+                                       name="aicfp_kling_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_kling_api_key', '')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <?php echo esc_html__('Kling AI, vidéos longues durées, jusqu\'à 2 min (~$0.45/vidéo)', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_genmo_api_key">
+                                    <?php echo esc_html__('Clé Genmo', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="text" 
+                                       id="aicfp_genmo_api_key" 
+                                       name="aicfp_genmo_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_genmo_api_key', '')); ?>" 
+                                       class="regular-text">
+                                <p class="description">
+                                    <?php echo esc_html__('Genmo Replay, animations créatives, 6s max (~$0.35/vidéo)', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <div class="aicfp-api-comparison-table" style="margin-top: 20px; padding: 15px; background: #f9fafb; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #1d2327;"><?php echo esc_html__('📊 Comparatif des moteurs vidéo', 'ai-content-factory-pro'); ?></h3>
+                        <table class="widefat" style="margin-top: 10px;">
+                            <thead>
+                                <tr style="background: #f0f0f1;">
+                                    <th style="padding: 12px; font-weight: 700;"><?php echo esc_html__('Moteur', 'ai-content-factory-pro'); ?></th>
+                                    <th style="padding: 12px; font-weight: 700;"><?php echo esc_html__('Coût/vidéo', 'ai-content-factory-pro'); ?></th>
+                                    <th style="padding: 12px; font-weight: 700;"><?php echo esc_html__('Durée max', 'ai-content-factory-pro'); ?></th>
+                                    <th style="padding: 12px; font-weight: 700;"><?php echo esc_html__('Qualité', 'ai-content-factory-pro'); ?></th>
+                                    <th style="padding: 12px; font-weight: 700;"><?php echo esc_html__('Spécialité', 'ai-content-factory-pro'); ?></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #f0f0f1;">
+                                    <td style="padding: 12px;"><strong>Google VEO 2/3</strong> ⭐</td>
+                                    <td style="padding: 12px; color: #00a32a; font-weight: 600;">$0.50</td>
+                                    <td style="padding: 12px;">2 min</td>
+                                    <td style="padding: 12px;">⭐⭐⭐⭐⭐</td>
+                                    <td style="padding: 12px;">Polyvalent</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f0f0f1;">
+                                    <td style="padding: 12px;"><strong>OpenAI Sora</strong></td>
+                                    <td style="padding: 12px; color: #d63638;">$1.00</td>
+                                    <td style="padding: 12px;">1 min</td>
+                                    <td style="padding: 12px;">⭐⭐⭐⭐⭐</td>
+                                    <td style="padding: 12px;">Premium</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f0f0f1;">
+                                    <td style="padding: 12px;"><strong>RunwayML Gen-3</strong></td>
+                                    <td style="padding: 12px; color: #dba617;">$0.60</td>
+                                    <td style="padding: 12px;">10s</td>
+                                    <td style="padding: 12px;">⭐⭐⭐⭐</td>
+                                    <td style="padding: 12px;">Créatif</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f0f0f1;">
+                                    <td style="padding: 12px;"><strong>Luma AI</strong></td>
+                                    <td style="padding: 12px; color: #00a32a; font-weight: 600;">$0.50</td>
+                                    <td style="padding: 12px;">5s</td>
+                                    <td style="padding: 12px;">⭐⭐⭐⭐</td>
+                                    <td style="padding: 12px;">Immersif</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f0f0f1;">
+                                    <td style="padding: 12px;"><strong>Kling AI</strong></td>
+                                    <td style="padding: 12px; color: #00a32a; font-weight: 600;">$0.45</td>
+                                    <td style="padding: 12px;">2 min</td>
+                                    <td style="padding: 12px;">⭐⭐⭐⭐</td>
+                                    <td style="padding: 12px;">Longues vidéos</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f0f0f1;">
+                                    <td style="padding: 12px;"><strong>Pika Labs</strong></td>
+                                    <td style="padding: 12px; color: #00a32a; font-weight: 600;">$0.40</td>
+                                    <td style="padding: 12px;">3s</td>
+                                    <td style="padding: 12px;">⭐⭐⭐</td>
+                                    <td style="padding: 12px;">Animation</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px;"><strong>Genmo</strong></td>
+                                    <td style="padding: 12px; color: #00a32a; font-weight: 600;">$0.35</td>
+                                    <td style="padding: 12px;">6s</td>
+                                    <td style="padding: 12px;">⭐⭐⭐</td>
+                                    <td style="padding: 12px;">Créatif</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
                 <!-- Notifications Section -->
                 <div class="aicfp-card">
                     <h2><?php echo esc_html__('Notifications', 'ai-content-factory-pro'); ?></h2>
@@ -602,6 +809,15 @@ class AICFP_Settings_Page {
         // Sauvegarder les clés des moteurs de génération d'images
         $image_apis = array('sdxl', 'sdxl_food', 'sdxl_finetuned', 'nanobanana', 'replicate', 'flux');
         foreach ($image_apis as $api) {
+            $key_name = 'aicfp_' . $api . '_api_key';
+            if (isset($_POST[$key_name])) {
+                update_option($key_name, sanitize_text_field($_POST[$key_name]));
+            }
+        }
+        
+        // Sauvegarder les clés des moteurs de génération vidéo
+        $video_apis = array('google_veo', 'sora', 'runway', 'pika', 'luma', 'kling', 'genmo');
+        foreach ($video_apis as $api) {
             $key_name = 'aicfp_' . $api . '_api_key';
             if (isset($_POST[$key_name])) {
                 update_option($key_name, sanitize_text_field($_POST[$key_name]));

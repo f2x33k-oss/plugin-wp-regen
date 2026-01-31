@@ -143,9 +143,15 @@
                 if (response.success) {
                     showNotification('✅ ' + response.data.message, 'success');
                     
+                    // Message de redirection
                     setTimeout(function() {
-                        window.location.href = 'admin.php?page=aicfp-instances';
-                    }, 2000);
+                        showNotification('🔄 Redirection vers le suivi des générations...', 'info');
+                    }, 1500);
+                    
+                    // Rediriger vers Instances avec highlight
+                    setTimeout(function() {
+                        window.location.href = 'admin.php?page=aicfp-instances&highlight=' + (response.data.task_id || '');
+                    }, 2500);
                 } else {
                     showNotification('❌ ' + response.data.message, 'error');
                 }

@@ -21,7 +21,9 @@ class AICFP_Ajax_Handler {
     public function __construct() {
         // Actions AJAX pour les utilisateurs connectés
         add_action('wp_ajax_aicfp_submit_generation', array($this, 'submit_generation'));
+        add_action('wp_ajax_aicfp_submit_album_idees', array($this, 'submit_album_idees'));
         add_action('wp_ajax_aicfp_get_queue_status', array($this, 'get_queue_status'));
+        add_action('wp_ajax_aicfp_start_task', array($this, 'start_task'));
         add_action('wp_ajax_aicfp_pause_task', array($this, 'pause_task'));
         add_action('wp_ajax_aicfp_resume_task', array($this, 'resume_task'));
         add_action('wp_ajax_aicfp_cancel_task', array($this, 'cancel_task'));
@@ -129,7 +131,55 @@ class AICFP_Ajax_Handler {
         update_post_meta($task_id, '_aicfp_image_api', $image_api);
         
         wp_send_json_success(array(
-            'message' => __('Tâche ajoutée à la file d\'attente avec succès.', 'ai-content-factory-pro'),
+            'message' => __('Album ajouté à la file d\'attente avec succès.', 'ai-content-factory-pro'),
+            'task_id' => $task_id
+        ));
+    }
+    
+    /**
+     * Soumettre un album d'idées
+     */
+    public function submit_album_idees() {
+        $this->verify_request();
+        
+        $title = sanitize_text_field($_POST['title'] ?? '');
+        $visual_style = sanitize_text_field($_POST['visual_style'] ?? 'realistic');
+        $image_format = sanitize_text_field($_POST['image_format'] ?? 'square');
+        $email = sanitize_email($_POST['email'] ?? '');
+        
+        // Validation
+        if (empty($title) || empty($email)) {
+            wp_send_json_error(array(
+                'message' => __('Titre et email requis.', 'ai-content-factory-pro')
+            ));
+        }
+        
+        $item_count = $this->extract_item_count($title);
+        $cost_estimate = $item_count * 0.05;
+        $time_estimate = ceil($item_count * 2);
+        
+        // Créer la tâche
+        $task_id = AICFP_Database::insert_task(array(
+            'title' => $title,
+            'generate_text' => 0,
+            'email' => $email,
+            'cost_estimate' => $cost_estimate,
+            'time_estimate' => $time_estimate
+        ));
+        
+        if (is_wp_error($task_id)) {
+            wp_send_json_error(array(
+                'message' => $task_id->get_error_message()
+            ));
+        }
+        
+        // Stocker les options
+        update_post_meta($task_id, '_aicfp_album_type', 'idees');
+        update_post_meta($task_id, '_aicfp_visual_style', $visual_style);
+        update_post_meta($task_id, '_aicfp_image_format', $image_format);
+        
+        wp_send_json_success(array(
+            'message' => __('Album d\'idées ajouté à la file d\'attente.', 'ai-content-factory-pro'),
             'task_id' => $task_id
         ));
     }
@@ -179,6 +229,42 @@ class AICFP_Ajax_Handler {
     }
     
     /**
+     * Démarrer une tâche manuellement
+     */
+    public function start_task() {
+        $this->verify_request();
+        
+        $task_id = intval($_POST['task_id'] ?? 0);
+        
+        if (!$task_id) {
+            wp_send_json_error(array(
+                'message' => __('ID de tâche invalide.', 'ai-content-factory-pro')
+            ));
+        }
+        
+        $task = AICFP_Database::get_task($task_id);
+        
+        if (!$task) {
+            wp_send_json_error(array(
+                'message' => __('Tâche introuvable.', 'ai-content-factory-pro')
+            ));
+        }
+        
+        if ($task->status !== 'pending' && $task->status !== 'paused') {
+            wp_send_json_error(array(
+                'message' => __('Seules les tâches en attente ou en pause peuvent être démarrées.', 'ai-content-factory-pro')
+            ));
+        }
+        
+        // Déclencher le traitement immédiat
+        AICFP_Queue_Manager::start_task($task);
+        
+        wp_send_json_success(array(
+            'message' => __('Génération démarrée avec succès.', 'ai-content-factory-pro')
+        ));
+    }
+    
+    /**
      * Mettre en pause une tâche
      */
     public function pause_task() {
@@ -196,11 +282,11 @@ class AICFP_Ajax_Handler {
         
         if ($result) {
             wp_send_json_success(array(
-                'message' => __('Tâche mise en pause.', 'ai-content-factory-pro')
+                'message' => __('Génération mise en pause.', 'ai-content-factory-pro')
             ));
         } else {
             wp_send_json_error(array(
-                'message' => __('Impossible de mettre en pause la tâche.', 'ai-content-factory-pro')
+                'message' => __('Impossible de mettre en pause.', 'ai-content-factory-pro')
             ));
         }
     }

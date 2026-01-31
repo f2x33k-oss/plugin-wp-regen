@@ -24,23 +24,27 @@
         });
         
         // Actions sur les tâches
+        $(document).on('click', '.aicfp-start-task', function() {
+            performTaskAction('aicfp_start_task', $(this).data('task-id'), 'Génération démarrée');
+        });
+        
         $(document).on('click', '.aicfp-pause-task', function() {
-            performTaskAction('aicfp_pause_task', $(this).data('task-id'));
+            performTaskAction('aicfp_pause_task', $(this).data('task-id'), 'Génération mise en pause');
         });
         
         $(document).on('click', '.aicfp-resume-task', function() {
-            performTaskAction('aicfp_resume_task', $(this).data('task-id'));
+            performTaskAction('aicfp_resume_task', $(this).data('task-id'), 'Génération reprise');
         });
         
         $(document).on('click', '.aicfp-cancel-task', function() {
-            if (confirm('Êtes-vous sûr de vouloir annuler cette tâche ?')) {
-                performTaskAction('aicfp_cancel_task', $(this).data('task-id'));
+            if (confirm('⚠️ Êtes-vous sûr de vouloir arrêter cette génération ? Cette action est irréversible.')) {
+                performTaskAction('aicfp_cancel_task', $(this).data('task-id'), 'Génération arrêtée');
             }
         });
         
         $(document).on('click', '.aicfp-delete-task', function() {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
-                performTaskAction('aicfp_delete_task', $(this).data('task-id'));
+            if (confirm('🗑️ Êtes-vous sûr de vouloir supprimer définitivement cette tâche ?')) {
+                performTaskAction('aicfp_delete_task', $(this).data('task-id'), 'Tâche supprimée');
             }
         });
     }
@@ -78,19 +82,35 @@
         }
         
         let html = '';
+        const urlParams = new URLSearchParams(window.location.search);
+        const highlightId = urlParams.get('highlight');
         
         tasks.forEach(function(task) {
-            html += renderTaskCard(task);
+            html += renderTaskCard(task, highlightId);
         });
         
         $container.html(html);
+        
+        // Scroller vers la tâche highlight
+        if (highlightId) {
+            setTimeout(function() {
+                const $highlighted = $('.aicfp-task-card[data-task-id="' + highlightId + '"]');
+                if ($highlighted.length) {
+                    $('html, body').animate({
+                        scrollTop: $highlighted.offset().top - 100
+                    }, 500);
+                }
+            }, 100);
+        }
     }
     
-    function renderTaskCard(task) {
+    function renderTaskCard(task, highlightId) {
         const statusClass = 'aicfp-status-' + task.status;
         const statusLabel = getStatusLabel(task.status);
+        const isHighlighted = highlightId && task.id == highlightId;
         
-        let html = '<div class="aicfp-task-card">';
+        let html = '<div class="aicfp-task-card' + (isHighlighted ? ' aicfp-task-highlighted' : '') + '" ';
+        html += 'data-task-id="' + task.id + '" data-status="' + task.status + '">';
         html += '  <div class="aicfp-task-header-modern">';
         html += '    <div>';
         html += '      <div class="aicfp-task-title-modern">' + escapeHtml(task.title) + '</div>';
@@ -110,27 +130,77 @@
             html += '  <div class="aicfp-progress-text-modern">' + task.progress + '% complété</div>';
         }
         
+        // Détails supplémentaires
+        html += '  <div class="aicfp-task-details">';
+        html += '    <div class="aicfp-detail-item">';
+        html += '      <span class="aicfp-detail-label">💰 Coût:</span>';
+        html += '      <span class="aicfp-detail-value">$' + task.cost_estimate + '</span>';
+        html += '    </div>';
+        html += '    <div class="aicfp-detail-item">';
+        html += '      <span class="aicfp-detail-label">⏱️ Temps:</span>';
+        html += '      <span class="aicfp-detail-value">' + task.time_estimate + ' min</span>';
+        html += '    </div>';
+        html += '    <div class="aicfp-detail-item">';
+        html += '      <span class="aicfp-detail-label">📅 Créé:</span>';
+        html += '      <span class="aicfp-detail-value">' + formatDate(task.created_at) + '</span>';
+        html += '    </div>';
+        if (task.started_at && task.status !== 'pending') {
+            html += '    <div class="aicfp-detail-item">';
+            html += '      <span class="aicfp-detail-label">🚀 Démarré:</span>';
+            html += '      <span class="aicfp-detail-value">' + formatDate(task.started_at) + '</span>';
+            html += '    </div>';
+        }
+        html += '  </div>';
+        
         // Actions
         html += '  <div class="aicfp-task-actions-modern">';
         
-        if (task.status === 'processing' || task.status === 'pending') {
-            html += '    <button class="aicfp-btn aicfp-btn-secondary aicfp-pause-task" data-task-id="' + task.id + '">⏸ Pause</button>';
+        // Bouton Démarrer (pour tâches en attente)
+        if (task.status === 'pending') {
+            html += '    <button class="aicfp-btn aicfp-btn-success aicfp-start-task" data-task-id="' + task.id + '">';
+            html += '      <span class="dashicons dashicons-controls-play"></span>';
+            html += '      Démarrer maintenant';
+            html += '    </button>';
         }
         
+        // Bouton Pause (pour tâches en cours)
+        if (task.status === 'processing') {
+            html += '    <button class="aicfp-btn aicfp-btn-warning aicfp-pause-task" data-task-id="' + task.id + '">';
+            html += '      <span class="dashicons dashicons-controls-pause"></span>';
+            html += '      Mettre en pause';
+            html += '    </button>';
+        }
+        
+        // Bouton Reprendre (pour tâches en pause)
         if (task.status === 'paused') {
-            html += '    <button class="aicfp-btn aicfp-btn-primary aicfp-resume-task" data-task-id="' + task.id + '">▶ Reprendre</button>';
+            html += '    <button class="aicfp-btn aicfp-btn-primary aicfp-resume-task" data-task-id="' + task.id + '">';
+            html += '      <span class="dashicons dashicons-controls-play"></span>';
+            html += '      Reprendre';
+            html += '    </button>';
         }
         
+        // Bouton Arrêter (pour toutes sauf terminées)
         if (task.status !== 'completed' && task.status !== 'cancelled') {
-            html += '    <button class="aicfp-btn aicfp-btn-text aicfp-cancel-task" data-task-id="' + task.id + '">✕ Annuler</button>';
+            html += '    <button class="aicfp-btn aicfp-btn-danger aicfp-cancel-task" data-task-id="' + task.id + '">';
+            html += '      <span class="dashicons dashicons-no"></span>';
+            html += '      Arrêter';
+            html += '    </button>';
         }
         
+        // Bouton Supprimer (pour terminées)
         if (task.status === 'completed' || task.status === 'cancelled') {
-            html += '    <button class="aicfp-btn aicfp-btn-text aicfp-delete-task" data-task-id="' + task.id + '">🗑 Supprimer</button>';
+            html += '    <button class="aicfp-btn aicfp-btn-text aicfp-delete-task" data-task-id="' + task.id + '">';
+            html += '      <span class="dashicons dashicons-trash"></span>';
+            html += '      Supprimer';
+            html += '    </button>';
         }
         
+        // Bouton Voir l'article
         if (task.post_id) {
-            html += '    <a href="post.php?post=' + task.post_id + '&action=edit" class="aicfp-btn aicfp-btn-success">📄 Voir l\'article</a>';
+            html += '    <a href="post.php?post=' + task.post_id + '&action=edit" class="aicfp-btn aicfp-btn-success">';
+            html += '      <span class="dashicons dashicons-edit"></span>';
+            html += '      Voir l\'article';
+            html += '    </a>';
         }
         
         html += '  </div>';
@@ -139,7 +209,14 @@
         return html;
     }
     
-    function performTaskAction(action, taskId) {
+    function performTaskAction(action, taskId, successMessage) {
+        successMessage = successMessage || 'Action effectuée';
+        
+        // Afficher une notification de chargement
+        const $loader = $('<div class="aicfp-notification aicfp-notification-info">⏳ Traitement en cours...</div>');
+        $('body').append($loader);
+        $loader.fadeIn(200);
+        
         $.ajax({
             url: aicfp_ajax.ajax_url,
             type: 'POST',
@@ -149,17 +226,42 @@
                 task_id: taskId
             },
             success: function(response) {
+                $loader.fadeOut(200, function() { $(this).remove(); });
+                
                 if (response.success) {
                     loadQueueStatus();
-                    showNotification('✅ Action effectuée', 'success');
+                    showNotification('✅ ' + successMessage, 'success');
                 } else {
                     showNotification('❌ ' + response.data.message, 'error');
                 }
             },
             error: function() {
+                $loader.fadeOut(200, function() { $(this).remove(); });
                 showNotification('❌ Une erreur est survenue', 'error');
             }
         });
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        
+        const date = new Date(dateString);
+        const now = new Date();
+        const diff = Math.floor((now - date) / 1000); // Différence en secondes
+        
+        if (diff < 60) {
+            return 'Il y a ' + diff + 's';
+        } else if (diff < 3600) {
+            return 'Il y a ' + Math.floor(diff / 60) + ' min';
+        } else if (diff < 86400) {
+            return 'Il y a ' + Math.floor(diff / 3600) + 'h';
+        } else {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return day + '/' + month + ' ' + hours + ':' + minutes;
+        }
     }
     
     function getStatusLabel(status) {

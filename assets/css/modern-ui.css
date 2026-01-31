@@ -276,6 +276,29 @@
     color: white;
 }
 
+.aicfp-btn-success:hover {
+    background: #008a24;
+}
+
+.aicfp-btn-warning {
+    background: var(--aicfp-warning);
+    color: #1d2327;
+    font-weight: 700;
+}
+
+.aicfp-btn-warning:hover {
+    background: #c69917;
+}
+
+.aicfp-btn-danger {
+    background: var(--aicfp-error);
+    color: white;
+}
+
+.aicfp-btn-danger:hover {
+    background: #b32d2e;
+}
+
 .aicfp-btn-text {
     background: transparent;
     color: var(--aicfp-primary);
@@ -941,17 +964,96 @@
 /* === INSTANCES PAGE === */
 .aicfp-instances-modern .aicfp-task-card {
     background: white;
-    border-radius: var(--aicfp-radius);
-    padding: 20px;
-    margin-bottom: 15px;
+    border-radius: var(--aicfp-radius-lg);
+    padding: 24px;
+    margin-bottom: 20px;
     box-shadow: var(--aicfp-shadow);
     transition: all 0.3s;
     animation: fadeIn 0.5s ease;
+    border-left: 4px solid var(--aicfp-border);
 }
 
 .aicfp-instances-modern .aicfp-task-card:hover {
     box-shadow: var(--aicfp-shadow-lg);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+}
+
+.aicfp-task-card[data-status="processing"] {
+    border-left-color: var(--aicfp-primary);
+    background: linear-gradient(to right, #f0f9ff, #ffffff);
+}
+
+.aicfp-task-card[data-status="pending"] {
+    border-left-color: var(--aicfp-secondary);
+}
+
+.aicfp-task-card[data-status="paused"] {
+    border-left-color: var(--aicfp-warning);
+}
+
+.aicfp-task-card[data-status="completed"] {
+    border-left-color: var(--aicfp-success);
+    background: linear-gradient(to right, #f0fdf4, #ffffff);
+}
+
+.aicfp-task-highlighted {
+    animation: highlightPulse 2s ease-in-out;
+    box-shadow: 0 0 0 4px rgba(34, 113, 177, 0.2), var(--aicfp-shadow-lg);
+}
+
+@keyframes highlightPulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(34, 113, 177, 0.2), var(--aicfp-shadow-lg); }
+    50% { box-shadow: 0 0 0 8px rgba(34, 113, 177, 0.4), var(--aicfp-shadow-lg); }
+}
+
+.aicfp-task-actions-modern {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f1;
+}
+
+.aicfp-task-actions-modern .aicfp-btn {
+    flex: 0 1 auto;
+    font-size: 13px;
+}
+
+.aicfp-task-actions-modern .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Task Details */
+.aicfp-task-details {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 15px 0;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: var(--aicfp-radius);
+}
+
+.aicfp-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.aicfp-detail-label {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.aicfp-detail-value {
+    font-size: 16px;
+    color: #1d2327;
+    font-weight: 700;
 }
 
 .aicfp-task-header-modern {
