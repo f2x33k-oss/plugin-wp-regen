@@ -17,7 +17,7 @@
     --aicfp-card-bg: #ffffff;
     --aicfp-border: #c3c4c7;
     --aicfp-text: #1d2327;
-    --aicfp-text-light: #50575e;
+    --aicfp-text-light: #3c434a;
     
     --aicfp-radius: 8px;
     --aicfp-radius-lg: 12px;
@@ -143,6 +143,7 @@
 /* === FORMULAIRES MODERNES === */
 .aicfp-form-section {
     padding: var(--aicfp-spacing);
+    background: white;
 }
 
 .aicfp-form-group {
@@ -151,10 +152,14 @@
 
 .aicfp-label {
     display: block;
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--aicfp-text);
+    font-weight: 700;
+    font-size: 15px;
+    color: #1d2327;
     margin-bottom: var(--aicfp-spacing-sm);
+}
+
+.aicfp-label .dashicons {
+    color: var(--aicfp-primary);
 }
 
 .aicfp-required {
@@ -179,20 +184,32 @@
 }
 
 .aicfp-input::placeholder {
-    color: #9ca3af;
+    color: #6b7280;
+    opacity: 0.8;
+}
+
+.aicfp-input:-ms-input-placeholder {
+    color: #6b7280;
+}
+
+.aicfp-input::-ms-input-placeholder {
+    color: #6b7280;
 }
 
 .aicfp-hint {
     margin: 8px 0 0 0;
     font-size: 13px;
-    color: var(--aicfp-text-light);
+    color: #3c434a;
+    line-height: 1.5;
 }
 
 .aicfp-hint-info {
-    padding: 10px;
+    padding: 12px 15px;
     background: #e7f5fe;
-    border-left: 3px solid var(--aicfp-info);
-    border-radius: 4px;
+    border-left: 4px solid var(--aicfp-info);
+    border-radius: 6px;
+    color: #0c5d8c;
+    font-weight: 500;
 }
 
 /* === INPUT GROUP === */
@@ -345,8 +362,9 @@
 }
 
 .aicfp-toggle-label-text {
-    font-weight: 500;
-    color: var(--aicfp-text);
+    font-weight: 600;
+    color: #1d2327;
+    font-size: 14px;
 }
 
 /* === CHECKBOX MODERNE === */
@@ -418,8 +436,9 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
-    font-weight: 600;
-    color: var(--aicfp-text);
+    font-weight: 700;
+    color: #0c5d8c;
+    font-size: 15px;
 }
 
 #aicfp-suggestions-list {
@@ -490,11 +509,14 @@
 
 .aicfp-pinterest-count {
     font-size: 16px;
+    color: #1d2327;
+    font-weight: 600;
 }
 
 .aicfp-pinterest-count strong {
     color: #e60023;
-    font-size: 24px;
+    font-size: 28px;
+    font-weight: 700;
 }
 
 .aicfp-pinterest-actions {
@@ -790,9 +812,10 @@
 
 .aicfp-help-item p {
     margin: 0;
-    font-size: 13px;
-    line-height: 1.5;
-    color: #856404;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #5a4300;
+    font-weight: 500;
 }
 
 /* === BADGES === */
@@ -817,33 +840,45 @@
     position: fixed;
     top: 32px;
     right: 20px;
-    padding: 16px 24px;
-    border-radius: var(--aicfp-radius);
+    padding: 18px 26px;
+    border-radius: var(--aicfp-radius-lg);
     box-shadow: var(--aicfp-shadow-lg);
     z-index: 99999;
     display: none;
     animation: slideIn 0.3s ease;
-    max-width: 400px;
+    max-width: 450px;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
 }
 
 .aicfp-notification-success {
-    background: var(--aicfp-success);
+    background: #00a32a;
     color: white;
+    border: 2px solid #008a24;
 }
 
 .aicfp-notification-error {
-    background: var(--aicfp-error);
+    background: #d63638;
     color: white;
+    border: 2px solid #b32d2e;
 }
 
 .aicfp-notification-warning {
-    background: var(--aicfp-warning);
-    color: white;
+    background: #f0b429;
+    color: #1d2327;
+    border: 2px solid #dba617;
+    font-weight: 700;
 }
 
 .aicfp-notification-info {
-    background: var(--aicfp-info);
+    background: #0891b2;
     color: white;
+    font-weight: 500;
+}
+
+.aicfp-notification strong {
+    font-weight: 700;
 }
 
 /* === FOOTER FORMULAIRE === */
@@ -935,7 +970,8 @@
 
 .aicfp-task-meta-modern {
     font-size: 13px;
-    color: var(--aicfp-text-light);
+    color: #3c434a;
+    font-weight: 500;
 }
 
 .aicfp-status-badge {
@@ -1083,13 +1119,22 @@
 
 /* === API SELECTOR === */
 .aicfp-api-selector {
-    background: linear-gradient(to right, #ffffff, #f9fafb);
+    background: white;
     border: 2px solid var(--aicfp-border);
     font-weight: 600;
     padding: 14px 16px;
+    color: #1d2327;
+    font-size: 15px;
 }
 
 .aicfp-api-selector:focus {
+    background: white;
+    border-color: var(--aicfp-primary);
+}
+
+.aicfp-api-selector option {
+    padding: 10px;
+    color: #1d2327;
     background: white;
 }
 
@@ -1104,16 +1149,19 @@
 
 .aicfp-api-info-content {
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.8;
+    color: #1d2327;
 }
 
 .aicfp-api-info-content strong {
-    color: var(--aicfp-primary);
+    color: #0c5d8c;
     font-size: 16px;
+    font-weight: 700;
 }
 
 .aicfp-api-info-content small {
-    color: var(--aicfp-text-light);
+    color: #1d2327;
+    font-weight: 500;
 }
 
 .aicfp-api-info-content[data-api="sdxl-food"] {

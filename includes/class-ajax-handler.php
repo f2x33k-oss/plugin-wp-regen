@@ -461,57 +461,77 @@ class AICFP_Ajax_Handler {
         $api_key = get_option('aicfp_pinterest_rapidapi_key');
         
         if (empty($api_key)) {
-            $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3'; // Clé par défaut
+            $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3';
         }
         
-        // Utiliser l'API Pinterest non officielle via RapidAPI
-        // Exemple d'endpoint : pinterest-scraper ou pinterest-api
-        $response = wp_remote_get(
-            'https://pinterest-scraper.p.rapidapi.com/search?query=' . urlencode($query) . '&limit=50',
+        // Essayer plusieurs endpoints Pinterest possibles
+        $endpoints = array(
             array(
-                'timeout' => 30,
-                'headers' => array(
-                    'x-rapidapi-host' => 'pinterest-scraper.p.rapidapi.com',
-                    'x-rapidapi-key' => $api_key
-                )
+                'url' => 'https://pinterest-api1.p.rapidapi.com/search',
+                'host' => 'pinterest-api1.p.rapidapi.com',
+                'params' => array('q' => $query, 'limit' => 50)
+            ),
+            array(
+                'url' => 'https://pinterest-scraper.p.rapidapi.com/search',
+                'host' => 'pinterest-scraper.p.rapidapi.com',
+                'params' => array('query' => $query, 'limit' => 50)
+            ),
+            array(
+                'url' => 'https://pinterest-data.p.rapidapi.com/search',
+                'host' => 'pinterest-data.p.rapidapi.com',
+                'params' => array('search' => $query, 'count' => 50)
             )
         );
         
-        if (is_wp_error($response)) {
-            wp_send_json_error(array(
-                'message' => $response->get_error_message()
-            ));
-        }
-        
-        $body = wp_remote_retrieve_body($response);
-        $data = json_decode($body, true);
-        
-        // Adapter selon le format de réponse de l'API Pinterest utilisée
         $images = array();
+        $last_error = '';
         
-        if (isset($data['results']) && is_array($data['results'])) {
-            foreach ($data['results'] as $item) {
-                $images[] = array(
-                    'url' => $item['image']['url'] ?? $item['images']['orig']['url'] ?? '',
-                    'thumbnail' => $item['image']['url'] ?? $item['images']['236x']['url'] ?? '',
-                    'title' => $item['title'] ?? $item['grid_title'] ?? '',
-                    'id' => $item['id'] ?? uniqid()
-                );
+        foreach ($endpoints as $endpoint) {
+            $url = $endpoint['url'] . '?' . http_build_query($endpoint['params']);
+            
+            $response = wp_remote_get($url, array(
+                'timeout' => 30,
+                'headers' => array(
+                    'x-rapidapi-host' => $endpoint['host'],
+                    'x-rapidapi-key' => $api_key
+                )
+            ));
+            
+            if (is_wp_error($response)) {
+                $last_error = $response->get_error_message();
+                continue;
             }
-        } elseif (isset($data['pins']) && is_array($data['pins'])) {
-            foreach ($data['pins'] as $pin) {
-                $images[] = array(
-                    'url' => $pin['images']['orig']['url'] ?? '',
-                    'thumbnail' => $pin['images']['236x']['url'] ?? '',
-                    'title' => $pin['title'] ?? $pin['grid_title'] ?? '',
-                    'id' => $pin['id'] ?? uniqid()
-                );
+            
+            $response_code = wp_remote_retrieve_response_code($response);
+            $body = wp_remote_retrieve_body($response);
+            $data = json_decode($body, true);
+            
+            // Logger pour debug
+            error_log('Pinterest API Response (' . $endpoint['host'] . '): ' . print_r($data, true));
+            
+            if ($response_code !== 200) {
+                $last_error = 'HTTP ' . $response_code;
+                continue;
+            }
+            
+            // Parser selon différents formats possibles
+            $images = self::parse_pinterest_response($data);
+            
+            if (!empty($images)) {
+                break; // Succès avec cet endpoint
             }
         }
         
+        // Si aucune API n'a fonctionné, utiliser des images de démonstration
         if (empty($images)) {
-            wp_send_json_error(array(
-                'message' => __('Aucune image trouvée pour cette recherche.', 'ai-content-factory-pro')
+            // Générer des images de démonstration avec des URLs Unsplash
+            $images = self::get_demo_images($query);
+            
+            wp_send_json_success(array(
+                'images' => $images,
+                'count' => count($images),
+                'demo' => true,
+                'message' => __('Mode démo : Images Unsplash affichées. Configurez une clé Pinterest valide pour utiliser Pinterest.', 'ai-content-factory-pro')
             ));
         }
         
@@ -519,6 +539,146 @@ class AICFP_Ajax_Handler {
             'images' => $images,
             'count' => count($images)
         ));
+    }
+    
+    /**
+     * Parser la réponse Pinterest selon différents formats
+     */
+    private static function parse_pinterest_response($data) {
+        $images = array();
+        
+        // Format 1: results array
+        if (isset($data['results']) && is_array($data['results'])) {
+            foreach ($data['results'] as $item) {
+                $image = self::extract_image_from_item($item);
+                if ($image) {
+                    $images[] = $image;
+                }
+            }
+        }
+        
+        // Format 2: pins array
+        if (isset($data['pins']) && is_array($data['pins'])) {
+            foreach ($data['pins'] as $pin) {
+                $image = self::extract_image_from_item($pin);
+                if ($image) {
+                    $images[] = $image;
+                }
+            }
+        }
+        
+        // Format 3: data array
+        if (isset($data['data']) && is_array($data['data'])) {
+            foreach ($data['data'] as $item) {
+                $image = self::extract_image_from_item($item);
+                if ($image) {
+                    $images[] = $image;
+                }
+            }
+        }
+        
+        // Format 4: items array
+        if (isset($data['items']) && is_array($data['items'])) {
+            foreach ($data['items'] as $item) {
+                $image = self::extract_image_from_item($item);
+                if ($image) {
+                    $images[] = $image;
+                }
+            }
+        }
+        
+        return $images;
+    }
+    
+    /**
+     * Extraire l'image d'un item Pinterest
+     */
+    private static function extract_image_from_item($item) {
+        // Chercher l'URL dans différents chemins possibles
+        $url = null;
+        $thumbnail = null;
+        
+        // Images object
+        if (isset($item['images'])) {
+            $url = $item['images']['orig']['url'] ?? $item['images']['original']['url'] ?? '';
+            $thumbnail = $item['images']['236x']['url'] ?? $item['images']['237x']['url'] ?? $item['images']['thumbnail']['url'] ?? '';
+        }
+        
+        // Image object direct
+        if (isset($item['image'])) {
+            if (is_string($item['image'])) {
+                $url = $item['image'];
+                $thumbnail = $item['image'];
+            } elseif (is_array($item['image'])) {
+                $url = $item['image']['url'] ?? $item['image']['original'] ?? '';
+                $thumbnail = $item['image']['thumbnail'] ?? $item['image']['url'] ?? '';
+            }
+        }
+        
+        // URL directe
+        if (isset($item['url']) && strpos($item['url'], 'http') === 0) {
+            $url = $item['url'];
+            $thumbnail = $item['thumbnail'] ?? $item['url'];
+        }
+        
+        // Media object
+        if (isset($item['media'])) {
+            $url = $item['media']['url'] ?? '';
+            $thumbnail = $item['media']['thumbnail'] ?? $url;
+        }
+        
+        if (empty($url)) {
+            return null;
+        }
+        
+        return array(
+            'url' => $url,
+            'thumbnail' => $thumbnail ?: $url,
+            'title' => $item['title'] ?? $item['grid_title'] ?? $item['description'] ?? '',
+            'id' => $item['id'] ?? uniqid()
+        );
+    }
+    
+    /**
+     * Obtenir des images de démonstration via Unsplash
+     */
+    private static function get_demo_images($query) {
+        $images = array();
+        
+        // Utiliser l'API Unsplash comme fallback
+        $response = wp_remote_get(
+            'https://api.unsplash.com/search/photos?query=' . urlencode($query) . '&per_page=30&client_id=demo',
+            array('timeout' => 15)
+        );
+        
+        if (!is_wp_error($response)) {
+            $data = json_decode(wp_remote_retrieve_body($response), true);
+            
+            if (isset($data['results']) && is_array($data['results'])) {
+                foreach ($data['results'] as $photo) {
+                    $images[] = array(
+                        'url' => $photo['urls']['regular'] ?? '',
+                        'thumbnail' => $photo['urls']['small'] ?? '',
+                        'title' => $photo['description'] ?? $photo['alt_description'] ?? '',
+                        'id' => $photo['id'] ?? uniqid()
+                    );
+                }
+            }
+        }
+        
+        // Si Unsplash échoue aussi, générer des URLs de placeholder
+        if (empty($images)) {
+            for ($i = 1; $i <= 20; $i++) {
+                $images[] = array(
+                    'url' => 'https://picsum.photos/400/600?random=' . $i,
+                    'thumbnail' => 'https://picsum.photos/200/300?random=' . $i,
+                    'title' => $query . ' #' . $i,
+                    'id' => 'demo-' . $i
+                );
+            }
+        }
+        
+        return $images;
     }
     
     /**

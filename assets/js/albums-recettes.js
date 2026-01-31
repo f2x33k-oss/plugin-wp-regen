@@ -258,14 +258,19 @@
                     nonce: aicfp_ajax.nonce,
                     query: query
                 },
-                success: function(response) {
-                    if (response.success && response.data.images) {
-                        displayPinterestResults(response.data.images);
-                        showNotification(response.data.count + ' images trouvées', 'success');
+            success: function(response) {
+                if (response.success && response.data.images) {
+                    displayPinterestResults(response.data.images);
+                    
+                    if (response.data.demo) {
+                        showNotification('💡 ' + (response.data.message || 'Images de démonstration affichées'), 'info');
                     } else {
-                        showNotification(response.data.message || 'Aucune image trouvée', 'error');
+                        showNotification('✅ ' + response.data.count + ' images trouvées', 'success');
                     }
-                },
+                } else {
+                    showNotification('❌ ' + (response.data.message || 'Aucune image trouvée'), 'error');
+                }
+            },
                 error: function() {
                     showNotification('Erreur lors de la recherche Pinterest', 'error');
                 },
