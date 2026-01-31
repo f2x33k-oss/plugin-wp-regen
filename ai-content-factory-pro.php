@@ -164,11 +164,11 @@ class AI_Content_Factory_Pro {
      */
     public function enqueue_admin_assets($hook) {
         // Charger uniquement sur les pages du plugin
-        if (strpos($hook, 'ai-content-factory') === false && $hook !== 'post.php' && $hook !== 'post-new.php') {
+        if (strpos($hook, 'aicfp') === false && $hook !== 'post.php' && $hook !== 'post-new.php') {
             return;
         }
         
-        // Style principal
+        // Styles principaux
         wp_enqueue_style(
             'aicfp-admin-style',
             AICFP_PLUGIN_URL . 'assets/css/admin-style.css',
@@ -176,25 +176,59 @@ class AI_Content_Factory_Pro {
             AICFP_VERSION
         );
         
-        // Script principal
-        wp_enqueue_script(
-            'aicfp-admin-script',
-            AICFP_PLUGIN_URL . 'assets/js/admin-script.js',
-            array('jquery'),
-            AICFP_VERSION,
-            true
+        wp_enqueue_style(
+            'aicfp-modern-ui',
+            AICFP_PLUGIN_URL . 'assets/css/modern-ui.css',
+            array(),
+            AICFP_VERSION
         );
         
-        // Localiser le script pour AJAX
-        wp_localize_script('aicfp-admin-script', 'aicfp_ajax', array(
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('aicfp_nonce'),
-            'strings' => array(
-                'confirm_cancel' => __('Êtes-vous sûr de vouloir annuler cette tâche ?', 'ai-content-factory-pro'),
-                'confirm_delete' => __('Êtes-vous sûr de vouloir supprimer cette tâche ?', 'ai-content-factory-pro'),
-                'error_occurred' => __('Une erreur est survenue. Veuillez réessayer.', 'ai-content-factory-pro'),
-            )
-        ));
+        // Scripts spécifiques par page
+        if (strpos($hook, 'aicfp-albums-recettes') !== false) {
+            wp_enqueue_script(
+                'aicfp-albums-recettes',
+                AICFP_PLUGIN_URL . 'assets/js/albums-recettes.js',
+                array('jquery'),
+                AICFP_VERSION,
+                true
+            );
+        }
+        
+        if (strpos($hook, 'aicfp-albums-idees') !== false) {
+            wp_enqueue_script(
+                'aicfp-albums-idees',
+                AICFP_PLUGIN_URL . 'assets/js/albums-idees.js',
+                array('jquery'),
+                AICFP_VERSION,
+                true
+            );
+        }
+        
+        if (strpos($hook, 'aicfp-instances') !== false) {
+            wp_enqueue_script(
+                'aicfp-instances',
+                AICFP_PLUGIN_URL . 'assets/js/instances.js',
+                array('jquery'),
+                AICFP_VERSION,
+                true
+            );
+        }
+        
+        // Localiser les scripts pour AJAX
+        $scripts = array('aicfp-albums-recettes', 'aicfp-albums-idees', 'aicfp-instances');
+        foreach ($scripts as $script) {
+            if (wp_script_is($script, 'enqueued')) {
+                wp_localize_script($script, 'aicfp_ajax', array(
+                    'ajax_url' => admin_url('admin-ajax.php'),
+                    'nonce' => wp_create_nonce('aicfp_nonce'),
+                    'strings' => array(
+                        'confirm_cancel' => __('Êtes-vous sûr de vouloir annuler cette tâche ?', 'ai-content-factory-pro'),
+                        'confirm_delete' => __('Êtes-vous sûr de vouloir supprimer cette tâche ?', 'ai-content-factory-pro'),
+                        'error_occurred' => __('Une erreur est survenue. Veuillez réessayer.', 'ai-content-factory-pro'),
+                    )
+                ));
+            }
+        }
     }
     
     /**

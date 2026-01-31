@@ -1,0 +1,1104 @@
+/**
+ * UI Moderne pour AI Content Factory Pro
+ * Design System unifié pour toutes les pages
+ */
+
+/* === VARIABLES CSS === */
+:root {
+    --aicfp-primary: #2271b1;
+    --aicfp-primary-dark: #135e96;
+    --aicfp-secondary: #50575e;
+    --aicfp-success: #00a32a;
+    --aicfp-warning: #dba617;
+    --aicfp-error: #d63638;
+    --aicfp-info: #2271b1;
+    
+    --aicfp-bg: #f0f0f1;
+    --aicfp-card-bg: #ffffff;
+    --aicfp-border: #c3c4c7;
+    --aicfp-text: #1d2327;
+    --aicfp-text-light: #50575e;
+    
+    --aicfp-radius: 8px;
+    --aicfp-radius-lg: 12px;
+    --aicfp-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --aicfp-shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+    
+    --aicfp-spacing: 20px;
+    --aicfp-spacing-sm: 10px;
+    --aicfp-spacing-lg: 30px;
+}
+
+/* === ANIMATIONS === */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.aicfp-spin {
+    animation: spin 1s linear infinite !important;
+}
+
+/* === LAYOUT MODERNE === */
+.aicfp-modern-page {
+    background: var(--aicfp-bg);
+    margin: -10px -20px;
+    padding: 0;
+}
+
+.aicfp-page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: var(--aicfp-spacing-lg) var(--aicfp-spacing);
+    margin: 0;
+    box-shadow: var(--aicfp-shadow-lg);
+}
+
+.aicfp-page-header h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+}
+
+.aicfp-page-header h1 .dashicons {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+}
+
+.aicfp-subtitle {
+    margin: 10px 0 0 55px;
+    opacity: 0.95;
+    font-size: 16px;
+}
+
+.aicfp-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--aicfp-spacing);
+}
+
+.aicfp-grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: var(--aicfp-spacing);
+}
+
+@media (max-width: 1200px) {
+    .aicfp-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .aicfp-col-sidebar {
+        order: -1;
+    }
+}
+
+/* === CARDS MODERNES === */
+.aicfp-card-modern {
+    background: var(--aicfp-card-bg);
+    border-radius: var(--aicfp-radius-lg);
+    box-shadow: var(--aicfp-shadow);
+    overflow: hidden;
+    animation: fadeIn 0.5s ease;
+}
+
+.aicfp-card-header {
+    padding: var(--aicfp-spacing);
+    border-bottom: 1px solid var(--aicfp-border);
+    background: linear-gradient(to right, #f9fafb, #ffffff);
+}
+
+.aicfp-card-header h2,
+.aicfp-card-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--aicfp-text);
+}
+
+.aicfp-card-body {
+    padding: var(--aicfp-spacing);
+}
+
+/* === FORMULAIRES MODERNES === */
+.aicfp-form-section {
+    padding: var(--aicfp-spacing);
+}
+
+.aicfp-form-group {
+    margin-bottom: var(--aicfp-spacing-lg);
+}
+
+.aicfp-label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--aicfp-text);
+    margin-bottom: var(--aicfp-spacing-sm);
+}
+
+.aicfp-required {
+    color: var(--aicfp-error);
+    margin-left: 3px;
+}
+
+.aicfp-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--aicfp-border);
+    border-radius: var(--aicfp-radius);
+    font-size: 14px;
+    transition: all 0.2s;
+    background: white;
+}
+
+.aicfp-input:focus {
+    outline: none;
+    border-color: var(--aicfp-primary);
+    box-shadow: 0 0 0 3px rgba(34, 113, 177, 0.1);
+}
+
+.aicfp-input::placeholder {
+    color: #9ca3af;
+}
+
+.aicfp-hint {
+    margin: 8px 0 0 0;
+    font-size: 13px;
+    color: var(--aicfp-text-light);
+}
+
+.aicfp-hint-info {
+    padding: 10px;
+    background: #e7f5fe;
+    border-left: 3px solid var(--aicfp-info);
+    border-radius: 4px;
+}
+
+/* === INPUT GROUP === */
+.aicfp-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.aicfp-input-group .aicfp-input {
+    flex: 1;
+}
+
+/* === BOUTONS MODERNES === */
+.aicfp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--aicfp-radius);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.aicfp-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.aicfp-btn:active {
+    transform: translateY(0);
+}
+
+.aicfp-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.aicfp-btn-primary {
+    background: var(--aicfp-primary);
+    color: white;
+}
+
+.aicfp-btn-primary:hover {
+    background: var(--aicfp-primary-dark);
+    color: white;
+}
+
+.aicfp-btn-secondary {
+    background: #f0f0f1;
+    color: var(--aicfp-text);
+}
+
+.aicfp-btn-secondary:hover {
+    background: #dcdcde;
+}
+
+.aicfp-btn-success {
+    background: var(--aicfp-success);
+    color: white;
+}
+
+.aicfp-btn-text {
+    background: transparent;
+    color: var(--aicfp-primary);
+    padding: 8px 12px;
+}
+
+.aicfp-btn-text:hover {
+    background: rgba(34, 113, 177, 0.1);
+    transform: none;
+}
+
+.aicfp-btn-large {
+    padding: 16px 32px;
+    font-size: 16px;
+}
+
+.aicfp-btn .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.aicfp-btn-link {
+    background: none;
+    border: none;
+    color: var(--aicfp-primary);
+    cursor: pointer;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+}
+
+.aicfp-btn-link:hover {
+    text-decoration: underline;
+}
+
+/* === TOGGLE MODERNE === */
+.aicfp-toggle-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #f9fafb;
+    border-radius: var(--aicfp-radius);
+}
+
+.aicfp-toggle-modern input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.aicfp-toggle-slider {
+    position: relative;
+    display: block;
+    width: 52px;
+    height: 28px;
+    background: #dcdcde;
+    border-radius: 28px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.aicfp-toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.aicfp-toggle-modern input:checked + .aicfp-toggle-slider {
+    background: var(--aicfp-primary);
+}
+
+.aicfp-toggle-modern input:checked + .aicfp-toggle-slider::before {
+    transform: translateX(24px);
+}
+
+.aicfp-toggle-label-text {
+    font-weight: 500;
+    color: var(--aicfp-text);
+}
+
+/* === CHECKBOX MODERNE === */
+.aicfp-checkbox-group {
+    padding: 15px;
+    background: #f9fafb;
+    border-radius: var(--aicfp-radius);
+}
+
+.aicfp-checkbox-modern {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.aicfp-checkbox-modern input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.aicfp-checkbox-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--aicfp-border);
+    border-radius: 6px;
+    background: white;
+    transition: all 0.2s;
+}
+
+.aicfp-checkbox-icon::after {
+    content: '✓';
+    color: white;
+    font-weight: bold;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.2s;
+}
+
+.aicfp-checkbox-modern input:checked + .aicfp-checkbox-icon {
+    background: var(--aicfp-primary);
+    border-color: var(--aicfp-primary);
+}
+
+.aicfp-checkbox-modern input:checked + .aicfp-checkbox-icon::after {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.aicfp-checkbox-label {
+    font-weight: 500;
+}
+
+/* === SUGGESTIONS DE TITRES === */
+.aicfp-suggestions-panel {
+    background: linear-gradient(135deg, #e7f5fe 0%, #f0f9ff 100%);
+    border: 2px solid #c3e4ff;
+    border-radius: var(--aicfp-radius);
+    padding: 15px;
+    margin-top: 15px;
+    animation: slideIn 0.3s ease;
+}
+
+.aicfp-suggestions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: var(--aicfp-text);
+}
+
+#aicfp-suggestions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.aicfp-suggestion-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 16px;
+    background: white;
+    border: 2px solid var(--aicfp-primary);
+    border-radius: var(--aicfp-radius);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    color: var(--aicfp-text);
+}
+
+.aicfp-suggestion-button:hover {
+    background: var(--aicfp-primary);
+    color: white;
+    transform: translateX(5px);
+}
+
+.aicfp-suggestion-button .dashicons {
+    color: var(--aicfp-success);
+    flex-shrink: 0;
+}
+
+.aicfp-suggestion-button:hover .dashicons {
+    color: white;
+}
+
+/* === RECHERCHE PINTEREST === */
+.aicfp-search-bar-modern {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.aicfp-search-bar-modern .aicfp-input {
+    flex: 1;
+}
+
+.aicfp-pinterest-panel {
+    background: white;
+    border: 2px solid #e60023;
+    border-radius: var(--aicfp-radius-lg);
+    padding: 20px;
+    margin-top: 15px;
+    animation: fadeIn 0.3s ease;
+}
+
+.aicfp-pinterest-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f1;
+}
+
+.aicfp-pinterest-count {
+    font-size: 16px;
+}
+
+.aicfp-pinterest-count strong {
+    color: #e60023;
+    font-size: 24px;
+}
+
+.aicfp-pinterest-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.aicfp-pinterest-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.aicfp-pinterest-item {
+    position: relative;
+    border-radius: var(--aicfp-radius);
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.aicfp-pinterest-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+.aicfp-pinterest-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.aicfp-pinterest-item.selected {
+    border-color: #e60023;
+    box-shadow: 0 0 0 3px rgba(230, 0, 35, 0.2);
+}
+
+.aicfp-pinterest-item.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #e60023;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    animation: fadeIn 0.2s ease;
+}
+
+/* Scrollbar Pinterest */
+.aicfp-pinterest-grid-modern::-webkit-scrollbar {
+    width: 10px;
+}
+
+.aicfp-pinterest-grid-modern::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.aicfp-pinterest-grid-modern::-webkit-scrollbar-thumb {
+    background: #e60023;
+    border-radius: 10px;
+}
+
+.aicfp-pinterest-grid-modern::-webkit-scrollbar-thumb:hover {
+    background: #bd001c;
+}
+
+/* === TABS === */
+.aicfp-tabs-minimal {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+    background: #f0f0f1;
+    padding: 4px;
+    border-radius: var(--aicfp-radius);
+}
+
+.aicfp-tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--aicfp-text-light);
+    transition: all 0.2s;
+}
+
+.aicfp-tab-btn:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+.aicfp-tab-btn.active {
+    background: white;
+    color: var(--aicfp-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.aicfp-tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.aicfp-tab-content.active {
+    display: block;
+}
+
+/* === UPLOAD ZONES === */
+.aicfp-upload-zone {
+    border: 2px dashed var(--aicfp-border);
+    border-radius: var(--aicfp-radius);
+    padding: 30px;
+    text-align: center;
+    background: #fafafa;
+    transition: all 0.2s;
+}
+
+.aicfp-upload-zone:hover {
+    border-color: var(--aicfp-primary);
+    background: #f5f9ff;
+}
+
+.aicfp-file-input {
+    display: none;
+}
+
+.aicfp-upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    color: var(--aicfp-primary);
+    font-weight: 500;
+}
+
+.aicfp-upload-label .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+}
+
+/* === IMAGES INDIVIDUELLES === */
+.aicfp-image-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: white;
+    border: 1px solid var(--aicfp-border);
+    border-radius: var(--aicfp-radius);
+    margin-bottom: 10px;
+}
+
+.aicfp-preview {
+    width: 80px;
+    height: 80px;
+    border: 2px dashed #ddd;
+    border-radius: var(--aicfp-radius);
+    background-size: cover;
+    background-position: center;
+    background-color: #f5f5f5;
+    flex-shrink: 0;
+    display: none;
+}
+
+.aicfp-preview.has-image {
+    display: block;
+    border-style: solid;
+    border-color: var(--aicfp-success);
+}
+
+.aicfp-btn-remove {
+    background: var(--aicfp-error);
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.aicfp-btn-remove:hover {
+    background: #a02020;
+    transform: rotate(90deg);
+}
+
+/* === ESTIMATEUR === */
+.aicfp-card-estimator {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.aicfp-card-estimator .aicfp-card-header {
+    background: rgba(255,255,255,0.1);
+    border-bottom-color: rgba(255,255,255,0.2);
+}
+
+.aicfp-card-estimator h3 {
+    color: white;
+}
+
+.aicfp-stat-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(255,255,255,0.15);
+    border-radius: var(--aicfp-radius);
+    margin-bottom: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.aicfp-stat-box:last-child {
+    margin-bottom: 0;
+}
+
+.aicfp-stat-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.aicfp-stat-content {
+    flex: 1;
+}
+
+.aicfp-stat-label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    opacity: 0.9;
+    margin-bottom: 4px;
+}
+
+.aicfp-stat-value {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* === CARTE D'AIDE === */
+.aicfp-card-help {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+}
+
+.aicfp-card-help .aicfp-card-header {
+    background: rgba(255, 193, 7, 0.1);
+    border-bottom-color: #ffc107;
+}
+
+.aicfp-help-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.aicfp-help-item:last-child {
+    border-bottom: none;
+}
+
+.aicfp-help-item .dashicons {
+    color: #ffc107;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.aicfp-help-item p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #856404;
+}
+
+/* === BADGES === */
+.aicfp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    animation: fadeIn 0.3s ease;
+}
+
+.aicfp-badge-pinterest {
+    background: #e60023;
+    color: white;
+}
+
+/* === NOTIFICATIONS === */
+.aicfp-notification {
+    position: fixed;
+    top: 32px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: var(--aicfp-radius);
+    box-shadow: var(--aicfp-shadow-lg);
+    z-index: 99999;
+    display: none;
+    animation: slideIn 0.3s ease;
+    max-width: 400px;
+}
+
+.aicfp-notification-success {
+    background: var(--aicfp-success);
+    color: white;
+}
+
+.aicfp-notification-error {
+    background: var(--aicfp-error);
+    color: white;
+}
+
+.aicfp-notification-warning {
+    background: var(--aicfp-warning);
+    color: white;
+}
+
+.aicfp-notification-info {
+    background: var(--aicfp-info);
+    color: white;
+}
+
+/* === FOOTER FORMULAIRE === */
+.aicfp-form-footer {
+    padding: var(--aicfp-spacing);
+    background: linear-gradient(to top, #f9fafb, #ffffff);
+    border-top: 1px solid var(--aicfp-border);
+    text-align: center;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 782px) {
+    .aicfp-page-header h1 {
+        font-size: 24px;
+    }
+    
+    .aicfp-input-group {
+        flex-direction: column;
+    }
+    
+    .aicfp-pinterest-grid-modern {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+    
+    .aicfp-pinterest-toolbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .aicfp-btn-large {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* === LOADING STATES === */
+.aicfp-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: fadeIn 0.2s ease;
+}
+
+.aicfp-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--aicfp-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* === INSTANCES PAGE === */
+.aicfp-instances-modern .aicfp-task-card {
+    background: white;
+    border-radius: var(--aicfp-radius);
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: var(--aicfp-shadow);
+    transition: all 0.3s;
+    animation: fadeIn 0.5s ease;
+}
+
+.aicfp-instances-modern .aicfp-task-card:hover {
+    box-shadow: var(--aicfp-shadow-lg);
+    transform: translateY(-2px);
+}
+
+.aicfp-task-header-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.aicfp-task-title-modern {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--aicfp-text);
+    margin-bottom: 8px;
+}
+
+.aicfp-task-meta-modern {
+    font-size: 13px;
+    color: var(--aicfp-text-light);
+}
+
+.aicfp-status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.aicfp-status-pending {
+    background: #f0f0f1;
+    color: #50575e;
+}
+
+.aicfp-status-processing {
+    background: #d7f0ff;
+    color: #0c5d8c;
+}
+
+.aicfp-status-completed {
+    background: #d7f0db;
+    color: #006700;
+}
+
+.aicfp-status-paused {
+    background: #fcf0c3;
+    color: #8a6d00;
+}
+
+/* === PROGRESS BAR === */
+.aicfp-progress-modern {
+    height: 12px;
+    background: #f0f0f1;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 15px 0;
+    position: relative;
+}
+
+.aicfp-progress-fill-modern {
+    height: 100%;
+    background: linear-gradient(90deg, var(--aicfp-primary) 0%, var(--aicfp-primary-dark) 100%);
+    transition: width 0.5s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.aicfp-progress-fill-modern::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, .2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, .2) 50%,
+        rgba(255, 255, 255, .2) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 30px 30px;
+    animation: move 1s linear infinite;
+}
+
+@keyframes move {
+    0% { background-position: 0 0; }
+    100% { background-position: 30px 30px; }
+}
+
+.aicfp-progress-text-modern {
+    text-align: center;
+    font-size: 13px;
+    color: var(--aicfp-text-light);
+    margin-top: 8px;
+}
+
+/* === STATS DASHBOARD === */
+.aicfp-stats-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.aicfp-stat-card-modern {
+    background: white;
+    padding: 20px;
+    border-radius: var(--aicfp-radius);
+    box-shadow: var(--aicfp-shadow);
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.aicfp-stat-card-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.aicfp-stat-card-modern.stat-pending::before {
+    background: var(--aicfp-secondary);
+}
+
+.aicfp-stat-card-modern.stat-processing::before {
+    background: var(--aicfp-primary);
+}
+
+.aicfp-stat-card-modern.stat-completed::before {
+    background: var(--aicfp-success);
+}
+
+.aicfp-stat-card-modern.stat-paused::before {
+    background: var(--aicfp-warning);
+}
+
+.aicfp-stat-card-modern:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--aicfp-shadow-lg);
+}
+
+.aicfp-stat-number {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--aicfp-text);
+    display: block;
+    margin: 10px 0;
+}
+
+.aicfp-stat-label-modern {
+    font-size: 13px;
+    text-transform: uppercase;
+    color: var(--aicfp-text-light);
+    font-weight: 600;
+}
+
+/* === UTILITIES === */
+.aicfp-mt-20 { margin-top: 20px; }
+.aicfp-mb-20 { margin-bottom: 20px; }
+.aicfp-text-center { text-align: center; }
+.aicfp-text-muted { color: var(--aicfp-text-light); }
+
+/* === DARK MODE SUPPORT === */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --aicfp-bg: #1d2327;
+        --aicfp-card-bg: #2c3338;
+        --aicfp-border: #3c434a;
+        --aicfp-text: #ffffff;
+        --aicfp-text-light: #c3c4c7;
+    }
+    
+    .aicfp-input {
+        background: #1d2327;
+        color: white;
+    }
+}
