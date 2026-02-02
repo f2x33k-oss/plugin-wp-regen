@@ -528,34 +528,26 @@ class AICFP_Queue_Manager {
     }
     
     /**
-     * Nettoyer le texte de recette (retirer markdown)
+     * Nettoyer le texte de recette (retirer TOUT markdown et HTML)
      */
     private static function clean_recipe_text($text) {
-        // Retirer les ####, ###, ##
+        // Retirer TOUTES les balises HTML
+        $text = strip_tags($text);
+        
+        // Retirer les ####, ###, ##, #
         $text = preg_replace('/^####\s+/m', '', $text);
         $text = preg_replace('/^###\s+/m', '', $text);
         $text = preg_replace('/^##\s+/m', '', $text);
+        $text = preg_replace('/^#\s+/m', '', $text);
         $text = preg_replace('/\n####\s+/', "\n", $text);
         $text = preg_replace('/\n###\s+/', "\n", $text);
+        $text = preg_replace('/\n##\s+/', "\n", $text);
         
-        // Retirer les - devant les émojis des ingrédients
-        $text = preg_replace('/^-\s+([🥔🧅🧄🥕🍅🥒🥬🥦🌽🍄🥛🧈🧀🥚🥩🍗🥓🐟🦐🧂])/m', '$1', $text);
+        // Retirer les - devant les émojis
+        $text = preg_replace('/^-\s+([🥔🧅🧄🥕🍅🥒🥬🥦🌽🍄🥛🧈🧀🥚🥩🍗🥓🐟🦐🧂🫒🍯🌶️🫚])/m', '$1', $text);
         
-        // Mettre les étapes en gras (avec emoji)
-        $text = preg_replace('/^(\d️⃣\s+[🔪🧈🔥❄️🥄🍳🔄⏲️🎨]\s+[^:]+:)/m', '<strong>$1</strong>', $text);
-        
-        // Identifier et mettre Ingrédients et Préparation en H3
-        $text = preg_replace('/^(INGRÉDIENTS|Ingrédients|INGREDIENTS|Ingredients)\s*:?\s*$/mi', '<h3>Ingrédients</h3>', $text);
-        $text = preg_replace('/^(PRÉPARATION|Préparation|PREPARATION|Preparation|ÉTAPES|Étapes|ETAPES|Etapes)\s*:?\s*$/mi', '<h3>Préparation</h3>', $text);
-        
-        // Retirer les ** restants
-        $text = str_replace('**', '', $text);
-        
-        // Retirer les __
-        $text = str_replace('__', '', $text);
-        
-        // Retirer les ``` (code blocks)
-        $text = str_replace('```', '', $text);
+        // Retirer les ** __ ```
+        $text = str_replace(['**', '__', '```', '`'], '', $text);
         
         return $text;
     }
