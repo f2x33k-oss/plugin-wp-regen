@@ -240,16 +240,16 @@
                 html += '        </a>';
             }
             
-            // Lien Google Drive (images ZIP)
-            html += '        <a href="#" class="aicfp-btn aicfp-btn-primary aicfp-btn-small" onclick="alert(\'Google Drive sera disponible après configuration des APIs Google\');">';
+            // Lien Google Drive (images ZIP) - Placeholder pour l'instant
+            html += '        <button class="aicfp-btn aicfp-btn-primary aicfp-btn-small aicfp-download-images" data-task-id="' + task.id + '">';
             html += '          <span class="dashicons dashicons-download"></span> Images (ZIP)';
-            html += '        </a>';
+            html += '        </button>';
             
             // Lien Google Docs (textes)
             if (task.generate_text) {
-                html += '        <a href="#" class="aicfp-btn aicfp-btn-secondary aicfp-btn-small" onclick="alert(\'Google Docs sera disponible après configuration des APIs Google\');">';
+                html += '        <button class="aicfp-btn aicfp-btn-secondary aicfp-btn-small aicfp-download-texts" data-task-id="' + task.id + '">';
                 html += '          <span class="dashicons dashicons-media-document"></span> Textes (Doc)';
-                html += '        </a>';
+                html += '        </button>';
             }
             
             html += '      </div>';
