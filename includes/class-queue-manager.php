@@ -147,13 +147,28 @@ class AICFP_Queue_Manager {
         $image_url = AICFP_Image_API_Manager::generate_image($prompt, $image_api, $reference_images);
         
         if (is_wp_error($image_url)) {
-            self::log_error($task_id, sprintf(
+            $error_msg = sprintf(
                 __('Erreur génération image item %d: %s', 'ai-content-factory-pro'),
                 $item_number,
                 $image_url->get_error_message()
-            ));
-            // Continuer avec l'item suivant même si l'image a échoué
-            $image_url = null;
+            );
+            self::log_error($task_id, $error_msg);
+            
+            // STOP la génération si erreur (option configurable)
+            if (get_option('aicfp_stop_on_error', true)) {
+                AICFP_Database::update_task($task_id, array(
+                    'status' => 'failed',
+                    'completed_at' => current_time('mysql')
+                ));
+                
+                if (get_option('aicfp_verbose_logging', true)) {
+                    error_log('AICFP: Génération arrêtée - Erreur critique item ' . $item_number);
+                }
+                
+                return; // STOP
+            }
+            
+            $image_url = null; // Continue si option désactivée
         }
         
         // ÉTAPE 2: Générer le texte via ChatGPT en analysant l'image générée
