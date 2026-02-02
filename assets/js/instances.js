@@ -8,19 +8,25 @@
     });
     
     function initInstances() {
-        if ($('.aicfp-instances-page').length === 0) {
+        if ($('.aicfp-instances-page').length === 0 && $('.aicfp-instances-modern').length === 0) {
             return;
         }
         
-        // Charger les tâches
+        console.log('AICFP: Initialisation Instances OK');
+        
+        // Charger les tâches IMMÉDIATEMENT
         loadQueueStatus();
         
-        // Auto-refresh toutes les 10 secondes
-        refreshInterval = setInterval(loadQueueStatus, 10000);
+        // Auto-refresh toutes les 5 secondes (plus rapide)
+        refreshInterval = setInterval(loadQueueStatus, 5000);
         
         // Bouton refresh manuel
         $('#aicfp-refresh-tasks').on('click', function() {
+            $(this).addClass('aicfp-spin');
             loadQueueStatus();
+            setTimeout(function() {
+                $('#aicfp-refresh-tasks .dashicons').removeClass('aicfp-spin');
+            }, 1000);
         });
         
         // Actions sur les tâches
@@ -77,40 +83,64 @@
         const $container = $('#aicfp-tasks-container');
         
         if (tasks.length === 0) {
-            $container.html('<div class="aicfp-empty-state"><p>📋 Aucune tâche dans la file d\'attente</p></div>');
+            $container.html('<div class="aicfp-empty-state"><p>📋 Aucune tâche dans la file d\'attente</p><p class="description">Créez votre premier album depuis le menu Albums Recettes ou Albums Idées</p></div>');
             return;
         }
         
-        let html = '';
         const urlParams = new URLSearchParams(window.location.search);
         const highlightId = urlParams.get('highlight');
         
-        tasks.forEach(function(task) {
-            html += renderTaskCard(task, highlightId);
-        });
+        // Séparer les tâches en cours et terminées
+        const activeTasks = tasks.filter(t => t.status === 'processing' || t.status === 'pending' || t.status === 'paused');
+        const completedTasks = tasks.filter(t => t.status === 'completed' || t.status === 'cancelled' || t.status === 'failed');
+        
+        let html = '';
+        
+        // Section tâches actives EN HAUT
+        if (activeTasks.length > 0) {
+            html += '<div class="aicfp-active-section">';
+            html += '  <h2 class="aicfp-section-title">⚡ Génération(s) en cours</h2>';
+            activeTasks.forEach(function(task) {
+                html += renderTaskCard(task, highlightId, true); // true = gamified
+            });
+            html += '</div>';
+        }
+        
+        // Section historique EN BAS
+        if (completedTasks.length > 0) {
+            html += '<div class="aicfp-history-section">';
+            html += '  <h2 class="aicfp-section-title">📚 Historique des générations</h2>';
+            completedTasks.forEach(function(task) {
+                html += renderTaskCard(task, highlightId, false); // false = compact
+            });
+            html += '</div>';
+        }
         
         $container.html(html);
         
-        // Scroller vers la tâche highlight
+        // Scroll vers highlight si présent
         if (highlightId) {
             setTimeout(function() {
                 const $highlighted = $('.aicfp-task-card[data-task-id="' + highlightId + '"]');
                 if ($highlighted.length) {
                     $('html, body').animate({
-                        scrollTop: $highlighted.offset().top - 100
+                        scrollTop: Math.max(0, $highlighted.offset().top - 150)
                     }, 500);
                 }
-            }, 100);
+            }, 200);
         }
     }
     
-    function renderTaskCard(task, highlightId) {
+    function renderTaskCard(task, highlightId, gamified) {
         const statusClass = 'aicfp-status-' + task.status;
         const statusLabel = getStatusLabel(task.status);
         const isHighlighted = highlightId && task.id == highlightId;
+        const isActive = task.status === 'processing' || task.status === 'pending' || task.status === 'paused';
         
-        let html = '<div class="aicfp-task-card' + (isHighlighted ? ' aicfp-task-highlighted' : '') + '" ';
-        html += 'data-task-id="' + task.id + '" data-status="' + task.status + '">';
+        let html = '<div class="aicfp-task-card';
+        html += (isHighlighted ? ' aicfp-task-highlighted' : '');
+        html += (gamified && isActive ? ' aicfp-task-gamified' : '');
+        html += '" data-task-id="' + task.id + '" data-status="' + task.status + '">';
         html += '  <div class="aicfp-task-header-modern">';
         html += '    <div>';
         html += '      <div class="aicfp-task-title-modern">' + escapeHtml(task.title) + '</div>';
@@ -195,14 +225,36 @@
             html += '    </button>';
         }
         
-        // Bouton Voir l'article
-        if (task.post_id) {
-            html += '    <a href="post.php?post=' + task.post_id + '&action=edit" class="aicfp-btn aicfp-btn-success">';
-            html += '      <span class="dashicons dashicons-edit"></span>';
-            html += '      Voir l\'article';
-            html += '    </a>';
+        // Liens de téléchargement pour tâches terminées
+        if (task.status === 'completed') {
+            html += '    <div class="aicfp-download-links" style="margin-top: 15px; padding-top: 15px; border-top: 2px dashed #e5e7eb;">';
+            html += '      <h4 style="margin: 0 0 10px 0; font-size: 13px; color: #6b7280; text-transform: uppercase;">📦 Téléchargements</h4>';
+            html += '      <div style="display: flex; gap: 10px; flex-wrap: wrap;">';
+            
+            // Lien article WordPress
+            if (task.post_id) {
+                html += '        <a href="post.php?post=' + task.post_id + '&action=edit" class="aicfp-btn aicfp-btn-success aicfp-btn-small">';
+                html += '          <span class="dashicons dashicons-edit"></span> Article WP';
+                html += '        </a>';
+            }
+            
+            // Lien Google Drive (images ZIP)
+            html += '        <a href="#" class="aicfp-btn aicfp-btn-primary aicfp-btn-small" onclick="alert(\'Google Drive sera disponible après configuration des APIs Google\');">';
+            html += '          <span class="dashicons dashicons-download"></span> Images (ZIP)';
+            html += '        </a>';
+            
+            // Lien Google Docs (textes)
+            if (task.generate_text) {
+                html += '        <a href="#" class="aicfp-btn aicfp-btn-secondary aicfp-btn-small" onclick="alert(\'Google Docs sera disponible après configuration des APIs Google\');">';
+                html += '          <span class="dashicons dashicons-media-document"></span> Textes (Doc)';
+                html += '        </a>';
+            }
+            
+            html += '      </div>';
+            html += '    </div>';
         }
         
+        // Boutons standards
         html += '  </div>';
         html += '</div>';
         
