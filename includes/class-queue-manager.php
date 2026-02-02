@@ -240,15 +240,23 @@ class AICFP_Queue_Manager {
             
             $post_id = wp_insert_post($post_data);
             
-            if (!is_wp_error($post_id) && !empty($generated_images)) {
-                // Définir la première image comme image à la une
-                $first_image_url = $generated_images[0]['url'];
-                self::set_featured_image_from_url($post_id, $first_image_url);
-                
-                // Associer les métadonnées
+            if (!is_wp_error($post_id)) {
+                // Associer les métadonnées TOUJOURS (même si pas d'images)
                 update_post_meta($post_id, '_aicfp_task_id', $task->id);
-                update_post_meta($post_id, '_aicfp_generated_images', $generated_images);
-                update_post_meta($post_id, '_aicfp_prompts_log', maybe_unserialize($task->prompts_log));
+                
+                if (get_option('aicfp_verbose_logging', true)) {
+                    error_log('AICFP: Métadonnée _aicfp_task_id sauvegardée pour post ' . $post_id . ' = ' . $task->id);
+                }
+                
+                if (!empty($generated_images)) {
+                    // Définir la première image comme image à la une
+                    $first_image_url = $generated_images[0]['url'];
+                    self::set_featured_image_from_url($post_id, $first_image_url);
+                    
+                    // Sauvegarder images et prompts
+                    update_post_meta($post_id, '_aicfp_generated_images', $generated_images);
+                    update_post_meta($post_id, '_aicfp_prompts_log', maybe_unserialize($task->prompts_log));
+                }
             }
         }
         
