@@ -672,7 +672,7 @@ class AICFP_Settings_Page {
                                            id="aicfp_stop_on_error" 
                                            name="aicfp_stop_on_error" 
                                            value="1" 
-                                           <?php checked(get_option('aicfp_stop_on_error', true), true); ?>>
+                                           <?php checked(get_option('aicfp_stop_on_error', false), true); ?>>
                                     <?php echo esc_html__('Arrêter la génération si une erreur critique survient', 'ai-content-factory-pro'); ?>
                                 </label>
                                 <p class="description">

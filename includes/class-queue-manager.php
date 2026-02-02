@@ -154,8 +154,8 @@ class AICFP_Queue_Manager {
             );
             self::log_error($task_id, $error_msg);
             
-            // STOP la génération si erreur (option configurable)
-            if (get_option('aicfp_stop_on_error', true)) {
+            // STOP la génération si erreur (option configurable - défaut: false = continue)
+            if (get_option('aicfp_stop_on_error', false)) {
                 AICFP_Database::update_task($task_id, array(
                     'status' => 'failed',
                     'completed_at' => current_time('mysql')
