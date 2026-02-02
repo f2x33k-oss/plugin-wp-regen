@@ -600,8 +600,27 @@ class AICFP_Ajax_Handler {
             error_log('AICFP: Recherche Pinterest - Query: ' . $query);
         }
         
-        // Utiliser l'API Pinterest Unofficial (fiable)
+        // Essayer plusieurs APIs Pinterest (ordre de priorité)
         $endpoints = array(
+            // API 1: Pinterest Pin Search
+            array(
+                'url' => 'https://pinterest-pin-search.p.rapidapi.com/',
+                'host' => 'pinterest-pin-search.p.rapidapi.com',
+                'params' => array('r' => 'search/pinterest', 'keyword' => $query, 'offset' => 0)
+            ),
+            // API 2: Pinterest Image API
+            array(
+                'url' => 'https://pinterest-image-api1.p.rapidapi.com/images',
+                'host' => 'pinterest-image-api1.p.rapidapi.com',
+                'params' => array('term' => $query)
+            ),
+            // API 3: Pinterest Search API
+            array(
+                'url' => 'https://pinterest-search-api.p.rapidapi.com/search',
+                'host' => 'pinterest-search-api.p.rapidapi.com',
+                'params' => array('limit' => 50, 'filter' => 'all', 'query' => $query)
+            ),
+            // API 4: Unofficial Pinterest (fallback)
             array(
                 'url' => 'https://unofficial-pinterest-api.p.rapidapi.com/pinterest/boards/relevance',
                 'host' => 'unofficial-pinterest-api.p.rapidapi.com',
