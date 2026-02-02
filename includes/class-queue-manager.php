@@ -381,14 +381,55 @@ class AICFP_Queue_Manager {
     private static function generate_prompt($task, $item_number) {
         $base_title = $task->title;
         
-        // Exemple: "20 recettes de gratins" -> "Recette de gratin #1"
+        // Prompt simple pour le texte (sera enrichi après génération pour l'image)
         $prompt = sprintf(
-            __('Item %d basé sur: %s', 'ai-content-factory-pro'),
+            __('Recette %d de: %s', 'ai-content-factory-pro'),
             $item_number,
             $base_title
         );
         
         return apply_filters('aicfp_generate_prompt', $prompt, $task, $item_number);
+    }
+    
+    /**
+     * Créer prompt image détaillé à partir du texte recette
+     */
+    private static function create_image_prompt_from_recipe($recipe_text) {
+        // Utiliser ChatGPT/Gemini pour créer un prompt image professionnel
+        $system_prompt = "Tu es expert en direction artistique culinaire. Crée un prompt d'image détaillé, réaliste et appétissant à partir du texte de recette.\n\nFormat: professional food photography, ultra realistic, magazine style, homemade, appetizing.\n\nDécris: plat final, portions, ingrédients visibles, textures, couleurs, assiette, présentation, ambiance, éclairage naturel.\n\nInterdiction: personnages, mains.\n\nStyle: Vue trois-quarts ou dessus.";
+        
+        $api_key = get_option('aicfp_openai_api_key');
+        
+        if (empty($api_key)) {
+            // Fallback prompt simple
+            return "professional food photography of " . substr($recipe_text, 0, 100);
+        }
+        
+        $response = wp_remote_post('https://api.openai.com/v1/chat/completions', array(
+            'timeout' => 30,
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer ' . $api_key
+            ),
+            'body' => wp_json_encode(array(
+                'model' => 'gpt-4o',
+                'messages' => array(
+                    array('role' => 'system', 'content' => $system_prompt),
+                    array('role' => 'user', 'content' => substr($recipe_text, 0, 500))
+                ),
+                'max_tokens' => 200
+            ))
+        ));
+        
+        if (!is_wp_error($response)) {
+            $data = json_decode(wp_remote_retrieve_body($response), true);
+            if (isset($data['choices'][0]['message']['content'])) {
+                return trim($data['choices'][0]['message']['content']);
+            }
+        }
+        
+        // Fallback
+        return "professional food photography of delicious dish, ultra realistic, appetizing";
     }
     
     /**
