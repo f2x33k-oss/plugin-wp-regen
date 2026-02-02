@@ -1112,7 +1112,10 @@ class AICFP_Ajax_Handler {
         foreach ($generated_content as $index => $item) {
             $text_content .= "RECETTE " . ($index + 1) . "\n";
             $text_content .= str_repeat("=", 60) . "\n\n";
-            $text_content .= $item['content'] . "\n\n";
+            
+            // Nettoyer le markdown
+            $clean_content = self::clean_markdown($item['content']);
+            $text_content .= $clean_content . "\n\n";
             $text_content .= str_repeat("-", 60) . "\n\n";
         }
         
@@ -1199,6 +1202,26 @@ class AICFP_Ajax_Handler {
         } else {
             wp_send_json_error(array('message' => 'Erreur création ZIP'));
         }
+    }
+    
+    /**
+     * Nettoyer le markdown des textes
+     */
+    private static function clean_markdown($text) {
+        // Retirer ###
+        $text = preg_replace('/^###\s+/m', '', $text);
+        $text = preg_replace('/\n###\s+/', "\n", $text);
+        
+        // Retirer **
+        $text = str_replace('**', '', $text);
+        
+        // Retirer __
+        $text = str_replace('__', '', $text);
+        
+        // Retirer ```
+        $text = str_replace('```', '', $text);
+        
+        return $text;
     }
     
     /**

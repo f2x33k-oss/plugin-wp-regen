@@ -461,8 +461,11 @@ class AICFP_Queue_Manager {
                     $content .= "\n";
                 }
                 
-                // Ajouter le texte de la recette (directement sans wpautop qui peut causer des problèmes)
-                $formatted_text = nl2br(esc_html($recipe_text));
+                // Nettoyer le texte de la recette (retirer markdown)
+                $clean_text = self::clean_recipe_text($recipe_text);
+                
+                // Ajouter le texte de la recette
+                $formatted_text = nl2br(esc_html($clean_text));
                 $content .= '<div class="recipe-content">' . $formatted_text . '</div>';
                 $content .= "\n";
                 
@@ -481,6 +484,26 @@ class AICFP_Queue_Manager {
         }
         
         return $content;
+    }
+    
+    /**
+     * Nettoyer le texte de recette (retirer markdown)
+     */
+    private static function clean_recipe_text($text) {
+        // Retirer les ###
+        $text = preg_replace('/^###\s+/m', '', $text);
+        $text = preg_replace('/\n###\s+/m', "\n", $text);
+        
+        // Retirer les **
+        $text = str_replace('**', '', $text);
+        
+        // Retirer les __
+        $text = str_replace('__', '', $text);
+        
+        // Retirer les ``` (code blocks)
+        $text = str_replace('```', '', $text);
+        
+        return $text;
     }
     
     /**
