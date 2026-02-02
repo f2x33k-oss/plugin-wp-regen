@@ -19,6 +19,9 @@ class AICFP_Image_API_Manager {
             case 'sdxl':
                 return self::generate_with_sdxl($prompt, $reference_images);
             
+            case 'sdxl-fast':
+                return self::generate_with_sdxl_fast($prompt, $reference_images);
+            
             case 'sdxl-food':
                 return self::generate_with_sdxl_food($prompt, $reference_images);
             
@@ -88,6 +91,54 @@ class AICFP_Image_API_Manager {
         }
         
         return new WP_Error('sdxl_error', __('Impossible de générer l\'image avec SDXL.', 'ai-content-factory-pro'));
+    }
+    
+    /**
+     * SDXL Fast API (Ultra-rapide)
+     */
+    private static function generate_with_sdxl_fast($prompt, $reference_images = null) {
+        $api_key = get_option('aicfp_rapidapi_key'); // Utilise la même clé que Midjourney
+        
+        if (empty($api_key)) {
+            $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3';
+        }
+        
+        $response = wp_remote_post('https://sdxl-stable-diffusion-xl-fast-text-to-image-api1.p.rapidapi.com/v2/woiipru2dawbnt/run', array(
+            'timeout' => 60,
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'x-rapidapi-host' => 'sdxl-stable-diffusion-xl-fast-text-to-image-api1.p.rapidapi.com',
+                'x-rapidapi-key' => $api_key
+            ),
+            'body' => wp_json_encode(array(
+                'input' => array(
+                    'prompt' => $prompt,
+                    'negative_prompt' => 'blurry, low quality, watermark, text',
+                    'width' => 1024,
+                    'height' => 1024,
+                    'num_inference_steps' => 25,
+                    'guidance_scale' => 7.5,
+                    'num_images' => 1,
+                    'scheduler' => 'K_EULER'
+                )
+            ))
+        ));
+        
+        if (is_wp_error($response)) {
+            return $response;
+        }
+        
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+        
+        if (isset($data['output']) && is_array($data['output']) && !empty($data['output'])) {
+            return $data['output'][0];
+        }
+        
+        if (isset($data['image_url'])) {
+            return $data['image_url'];
+        }
+        
+        return new WP_Error('sdxl_fast_error', __('Erreur avec SDXL Fast.', 'ai-content-factory-pro'));
     }
     
     /**
