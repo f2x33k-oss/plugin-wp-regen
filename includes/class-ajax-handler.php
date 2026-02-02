@@ -673,17 +673,29 @@ class AICFP_Ajax_Handler {
             // Générer des images de démonstration avec des URLs Unsplash
             $images = self::get_demo_images($query);
             
+            if (get_option('aicfp_verbose_logging', true)) {
+                error_log('AICFP: Toutes APIs Pinterest ont échoué - Mode démo activé');
+            }
+            
             wp_send_json_success(array(
                 'images' => $images,
                 'count' => count($images),
                 'demo' => true,
                 'message' => __('Mode démo : Images Unsplash affichées. Configurez une clé Pinterest valide pour utiliser Pinterest.', 'ai-content-factory-pro')
             ));
+            return;
+        }
+        
+        // Succès avec Pinterest - PAS de mode démo
+        if (get_option('aicfp_verbose_logging', true)) {
+            error_log('AICFP: Pinterest OK - ' . count($images) . ' images trouvées');
         }
         
         wp_send_json_success(array(
             'images' => $images,
-            'count' => count($images)
+            'count' => count($images),
+            'demo' => false,
+            'message' => sprintf(__('%d images Pinterest trouvées', 'ai-content-factory-pro'), count($images))
         ));
     }
     
