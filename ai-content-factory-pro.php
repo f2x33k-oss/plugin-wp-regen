@@ -3,7 +3,7 @@
  * Plugin Name: AI Content Factory Pro
  * Plugin URI: https://example.com/ai-content-factory-pro
  * Description: Génération automatique de contenu et d'images via OpenAI et Midjourney avec système de file d'attente avancé.
- * Version: 1.6.0
+ * Version: 1.9.0
  * Author: AI Content Factory Team
  * Author URI: https://example.com
  * Text Domain: ai-content-factory-pro
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Définir les constantes du plugin
-define('AICFP_VERSION', '1.6.0');
+define('AICFP_VERSION', '1.9.0');
 define('AICFP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AICFP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AICFP_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -121,6 +121,22 @@ class AI_Content_Factory_Pro {
         $temp_dir = $upload_dir['basedir'] . '/aicfp-temp/';
         if (!file_exists($temp_dir)) {
             wp_mkdir_p($temp_dir);
+        }
+        
+        // Configurer les clés API par défaut si pas déjà définies
+        $default_rapidapi_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3';
+        
+        if (!get_option('aicfp_rapidapi_key')) {
+            update_option('aicfp_rapidapi_key', $default_rapidapi_key);
+        }
+        
+        if (!get_option('aicfp_pinterest_rapidapi_key')) {
+            update_option('aicfp_pinterest_rapidapi_key', $default_rapidapi_key);
+        }
+        
+        // Activer le logging par défaut
+        if (get_option('aicfp_verbose_logging') === false) {
+            update_option('aicfp_verbose_logging', true);
         }
         
         // Flush des règles de réécriture

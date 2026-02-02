@@ -26,14 +26,14 @@ class AICFP_Admin_Menu {
      * Ajouter les pages de menu
      */
     public function add_menu_pages() {
-        // Menu principal
+        // Menu principal avec icône personnalisée
         add_menu_page(
             __('AI Content Factory Pro', 'ai-content-factory-pro'),
             __('AI Content Factory', 'ai-content-factory-pro'),
             'manage_options',
             'aicfp-albums-recettes',
             array('AICFP_Albums_Recettes_Page', 'render'),
-            'dashicons-admin-generic',
+            'dashicons-superhero-alt',
             30
         );
         
@@ -41,7 +41,7 @@ class AICFP_Admin_Menu {
         add_submenu_page(
             'aicfp-albums-recettes',
             __('Albums Recettes', 'ai-content-factory-pro'),
-            __('Albums Recettes', 'ai-content-factory-pro'),
+            '<span class="dashicons dashicons-food" style="font-size: 16px; width: 16px; height: 16px; margin-right: 5px;"></span>' . __('Albums Recettes', 'ai-content-factory-pro'),
             'manage_options',
             'aicfp-albums-recettes',
             array('AICFP_Albums_Recettes_Page', 'render')
@@ -51,7 +51,7 @@ class AICFP_Admin_Menu {
         add_submenu_page(
             'aicfp-albums-recettes',
             __('Albums Idées', 'ai-content-factory-pro'),
-            __('Albums Idées', 'ai-content-factory-pro'),
+            '<span class="dashicons dashicons-format-gallery" style="font-size: 16px; width: 16px; height: 16px; margin-right: 5px;"></span>' . __('Albums Idées', 'ai-content-factory-pro'),
             'manage_options',
             'aicfp-albums-idees',
             array('AICFP_Albums_Idees_Page', 'render')
@@ -61,7 +61,7 @@ class AICFP_Admin_Menu {
         add_submenu_page(
             'aicfp-albums-recettes',
             __('Génération de Vidéos IA', 'ai-content-factory-pro'),
-            __('Vidéos', 'ai-content-factory-pro'),
+            '<span class="dashicons dashicons-video-alt3" style="font-size: 16px; width: 16px; height: 16px; margin-right: 5px;"></span>' . __('Vidéos', 'ai-content-factory-pro'),
             'manage_options',
             'aicfp-videos',
             array('AICFP_Videos_Page', 'render')
@@ -71,7 +71,7 @@ class AICFP_Admin_Menu {
         add_submenu_page(
             'aicfp-albums-recettes',
             __('File d\'attente', 'ai-content-factory-pro'),
-            __('Instances', 'ai-content-factory-pro'),
+            '<span class="dashicons dashicons-list-view" style="font-size: 16px; width: 16px; height: 16px; margin-right: 5px;"></span>' . __('Instances', 'ai-content-factory-pro'),
             'manage_options',
             'aicfp-instances',
             array('AICFP_Instances_Page', 'render')
@@ -81,7 +81,7 @@ class AICFP_Admin_Menu {
         add_submenu_page(
             'aicfp-albums-recettes',
             __('Réglages', 'ai-content-factory-pro'),
-            __('Réglages', 'ai-content-factory-pro'),
+            '<span class="dashicons dashicons-admin-settings" style="font-size: 16px; width: 16px; height: 16px; margin-right: 5px;"></span>' . __('Réglages', 'ai-content-factory-pro'),
             'manage_options',
             'aicfp-settings',
             array('AICFP_Settings_Page', 'render')
@@ -92,7 +92,7 @@ class AICFP_Admin_Menu {
             add_submenu_page(
                 'aicfp-albums-recettes',
                 __('Mode Debug', 'ai-content-factory-pro'),
-                __('🔧 Debug', 'ai-content-factory-pro'),
+                '<span class="dashicons dashicons-admin-tools" style="font-size: 16px; width: 16px; height: 16px; margin-right: 5px; color: #ff6b6b;"></span>' . __('Debug', 'ai-content-factory-pro'),
                 'manage_options',
                 'aicfp-debug',
                 array('AICFP_Debug_Page', 'render')

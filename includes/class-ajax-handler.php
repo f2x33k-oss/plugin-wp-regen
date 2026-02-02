@@ -126,6 +126,15 @@ class AICFP_Ajax_Handler {
         // API de génération d'images sélectionnée
         $image_api = sanitize_text_field($_POST['image_api'] ?? 'midjourney');
         
+        // VALIDATION CRITIQUE : Vérifier que les clés API nécessaires sont configurées
+        $validation_error = self::validate_api_keys($image_api, $generate_text);
+        if ($validation_error) {
+            error_log('AICFP: Erreur validation API - ' . $validation_error);
+            wp_send_json_error(array(
+                'message' => $validation_error
+            ));
+        }
+        
         // Recalculer avec l'API sélectionnée
         $text_cost = $generate_text ? ($item_count * 0.02) : 0;
         $image_cost = $item_count * AICFP_Image_API_Manager::get_cost_per_image($image_api);
@@ -590,6 +599,12 @@ class AICFP_Ajax_Handler {
         
         // Essayer plusieurs endpoints Pinterest possibles
         $endpoints = array(
+            // API Pinterest Scraper5 (recommandée)
+            array(
+                'url' => 'https://pinterest-scraper5.p.rapidapi.com/api/search',
+                'host' => 'pinterest-scraper5.p.rapidapi.com',
+                'params' => array('keyword' => $query, 'limit' => 50)
+            ),
             array(
                 'url' => 'https://pinterest-api1.p.rapidapi.com/search',
                 'host' => 'pinterest-api1.p.rapidapi.com',
@@ -599,11 +614,6 @@ class AICFP_Ajax_Handler {
                 'url' => 'https://pinterest-scraper.p.rapidapi.com/search',
                 'host' => 'pinterest-scraper.p.rapidapi.com',
                 'params' => array('query' => $query, 'limit' => 50)
-            ),
-            array(
-                'url' => 'https://pinterest-data.p.rapidapi.com/search',
-                'host' => 'pinterest-data.p.rapidapi.com',
-                'params' => array('search' => $query, 'count' => 50)
             )
         );
         
@@ -917,6 +927,69 @@ class AICFP_Ajax_Handler {
         wp_send_json_success(array(
             'results' => $results
         ));
+    }
+    
+    /**
+     * Valider que les clés API nécessaires sont configurées
+     */
+    private static function validate_api_keys($image_api, $generate_text) {
+        // Vérifier clé OpenAI si génération texte activée
+        if ($generate_text) {
+            $openai_key = get_option('aicfp_openai_api_key');
+            if (empty($openai_key)) {
+                return __('❌ Clé API OpenAI non configurée ! Allez dans Réglages → Clés API pour configurer votre clé OpenAI (obligatoire pour la génération de texte).', 'ai-content-factory-pro');
+            }
+        }
+        
+        // Vérifier clé API pour l'image selon le moteur sélectionné
+        switch ($image_api) {
+            case 'midjourney':
+                $key = get_option('aicfp_rapidapi_key');
+                if (empty($key)) {
+                    return __('❌ Clé API Midjourney non configurée ! Allez dans Réglages → Clés API → RapidAPI (Midjourney).', 'ai-content-factory-pro');
+                }
+                break;
+            
+            case 'sdxl':
+            case 'sdxl-food':
+            case 'sdxl-finetuned':
+            case 'nanobanana':
+            case 'flux-pro':
+                $key_name = 'aicfp_' . str_replace('-', '_', $image_api) . '_api_key';
+                $key = get_option($key_name);
+                if (empty($key)) {
+                    $api_names = array(
+                        'sdxl' => 'SDXL',
+                        'sdxl-food' => 'SDXL Food LoRA',
+                        'sdxl-finetuned' => 'Fine-tuned SDXL',
+                        'nanobanana' => 'Nanobanana',
+                        'flux-pro' => 'Flux Pro'
+                    );
+                    $api_name = $api_names[$image_api] ?? $image_api;
+                    return sprintf(
+                        __('❌ Clé API %s non configurée ! Allez dans Réglages → Moteurs de génération d\'images pour configurer cette API.', 'ai-content-factory-pro'),
+                        $api_name
+                    );
+                }
+                break;
+            
+            case 'dalle':
+                // DALL-E utilise la même clé qu'OpenAI
+                $key = get_option('aicfp_openai_api_key');
+                if (empty($key)) {
+                    return __('❌ Clé API OpenAI non configurée ! DALL-E 3 utilise la même clé qu\'OpenAI. Allez dans Réglages → Clés API.', 'ai-content-factory-pro');
+                }
+                break;
+            
+            case 'replicate':
+                $key = get_option('aicfp_replicate_api_key');
+                if (empty($key)) {
+                    return __('❌ Clé API Replicate non configurée ! Allez dans Réglages → Moteurs de génération d\'images → Replicate.', 'ai-content-factory-pro');
+                }
+                break;
+        }
+        
+        return null; // Pas d'erreur
     }
     
     /**
