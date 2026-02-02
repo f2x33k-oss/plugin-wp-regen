@@ -87,6 +87,16 @@ class AICFP_Admin_Menu {
             array('AICFP_Settings_Page', 'render')
         );
         
+        // Sous-menu: Erreurs
+        add_submenu_page(
+            'aicfp-albums-recettes',
+            __('Journal des Erreurs', 'ai-content-factory-pro'),
+            '<span class="dashicons dashicons-warning" style="font-size: 16px; width: 16px; height: 16px; margin-right: 5px; color: #d63638;"></span>' . __('Erreurs', 'ai-content-factory-pro'),
+            'manage_options',
+            'aicfp-errors',
+            array('AICFP_Errors_Page', 'render')
+        );
+        
         // Sous-menu: Debug (si activé)
         if (get_option('aicfp_debug_mode_enabled', false)) {
             add_submenu_page(

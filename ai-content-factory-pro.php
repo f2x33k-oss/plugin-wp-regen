@@ -3,7 +3,7 @@
  * Plugin Name: AI Content Factory Pro
  * Plugin URI: https://example.com/ai-content-factory-pro
  * Description: Génération automatique de contenu et d'images via OpenAI et Midjourney avec système de file d'attente avancé.
- * Version: 2.4.0
+ * Version: 2.6.0
  * Author: AI Content Factory Team
  * Author URI: https://example.com
  * Text Domain: ai-content-factory-pro
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Définir les constantes du plugin
-define('AICFP_VERSION', '2.4.0');
+define('AICFP_VERSION', '2.6.0');
 define('AICFP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AICFP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AICFP_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -75,6 +75,7 @@ class AI_Content_Factory_Pro {
         require_once AICFP_PLUGIN_DIR . 'admin/class-instances-page.php';
         require_once AICFP_PLUGIN_DIR . 'admin/class-meta-box.php';
         require_once AICFP_PLUGIN_DIR . 'admin/class-debug-page.php';
+        require_once AICFP_PLUGIN_DIR . 'admin/class-errors-page.php';
         
         // AJAX Handlers
         require_once AICFP_PLUGIN_DIR . 'includes/class-ajax-handler.php';
