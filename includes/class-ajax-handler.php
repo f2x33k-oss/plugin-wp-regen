@@ -1066,10 +1066,12 @@ class AICFP_Ajax_Handler {
                 break;
             
             case 'dalle':
+            case 'dall-e':
+            case 'dall-e-3':
                 // DALL-E utilise la même clé qu'OpenAI
                 $key = get_option('aicfp_openai_api_key');
                 if (empty($key)) {
-                    return __('❌ Clé API OpenAI non configurée ! DALL-E 3 utilise la même clé qu\'OpenAI. Allez dans Réglages → Clés API.', 'ai-content-factory-pro');
+                    return __('❌ Clé API OpenAI non configurée ! DALL-E 3 utilise votre clé OpenAI. Allez dans Réglages → Clés API → OpenAI.', 'ai-content-factory-pro');
                 }
                 break;
             
