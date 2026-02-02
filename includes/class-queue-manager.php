@@ -396,11 +396,33 @@ class AICFP_Queue_Manager {
      * Construire le contenu de l'article avec intro
      */
     private static function build_post_content_with_intro($intro, $generated_content, $generated_images) {
+        // Logging pour debug
+        if (get_option('aicfp_verbose_logging', true)) {
+            error_log('AICFP: Construction article - Intro: ' . strlen($intro) . ' chars');
+            error_log('AICFP: Contenu array: ' . (is_array($generated_content) ? count($generated_content) . ' items' : 'NON ARRAY'));
+            error_log('AICFP: Images array: ' . (is_array($generated_images) ? count($generated_images) . ' items' : 'NON ARRAY'));
+        }
+        
         // Intro de 30 mots
-        $content = '<p class="intro-paragraph"><strong>' . $intro . '</strong></p>';
+        $content = '<p class="intro-paragraph"><strong>' . esc_html($intro) . '</strong></p>';
         $content .= "\n\n";
         
-        if (is_array($generated_content) && is_array($generated_images)) {
+        // Vérifier que nous avons bien des arrays
+        if (!is_array($generated_content)) {
+            $generated_content = array();
+        }
+        
+        if (!is_array($generated_images)) {
+            $generated_images = array();
+        }
+        
+        // Logging du contenu
+        if (get_option('aicfp_verbose_logging', true)) {
+            error_log('AICFP: Nombre de recettes: ' . count($generated_content));
+            error_log('AICFP: Nombre d\'images: ' . count($generated_images));
+        }
+        
+        if (!empty($generated_content) && !empty($generated_images)) {
             foreach ($generated_content as $index => $item) {
                 // Extraire le titre de la recette du contenu
                 $recipe_text = $item['content'];
