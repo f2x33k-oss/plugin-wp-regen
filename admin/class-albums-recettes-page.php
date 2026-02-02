@@ -94,8 +94,16 @@ class AICFP_Albums_Recettes_Page {
                                                 <input type="checkbox" id="aicfp_generate_text" name="generate_text" value="1" checked>
                                                 <span class="aicfp-toggle-slider"></span>
                                             </label>
-                                            <span class="aicfp-toggle-label-text">
-                                                <?php echo esc_html__('Générer les textes via ChatGPT', 'ai-content-factory-pro'); ?>
+                                            <span class="aicfp-toggle-label-text" id="aicfp-text-engine-label">
+                                                <?php 
+                                                $engine = get_option('aicfp_text_engine', 'chatgpt');
+                                                $labels = array(
+                                                    'chatgpt' => 'Générer les textes via ChatGPT',
+                                                    'gemini' => 'Générer les textes via Gemini',
+                                                    'claude' => 'Générer les textes via Claude'
+                                                );
+                                                echo esc_html__($labels[$engine] ?? $labels['chatgpt'], 'ai-content-factory-pro');
+                                                ?>
                                             </span>
                                         </div>
                                     </div>
@@ -146,14 +154,14 @@ class AICFP_Albums_Recettes_Page {
                                             <?php echo esc_html__('Moteur de génération d\'images', 'ai-content-factory-pro'); ?>
                                         </label>
                                         <select id="aicfp_image_api" name="image_api" class="aicfp-input aicfp-api-selector">
-                                            <option value="midjourney" selected><?php echo esc_html__('🎨 Midjourney (RapidAPI)', 'ai-content-factory-pro'); ?></option>
-                                            <option value="sdxl"><?php echo esc_html__('🖼️ Stable Diffusion XL', 'ai-content-factory-pro'); ?></option>
-                                            <option value="sdxl-food"><?php echo esc_html__('🍽️ SDXL Food LoRA (Spécialisé recettes)', 'ai-content-factory-pro'); ?></option>
-                                            <option value="sdxl-finetuned"><?php echo esc_html__('⚡ Fine-tuned SDXL', 'ai-content-factory-pro'); ?></option>
-                                            <option value="dalle"><?php echo esc_html__('🤖 DALL-E 3 (ChatGPT)', 'ai-content-factory-pro'); ?></option>
-                                            <option value="nanobanana"><?php echo esc_html__('🍌 Nanobanana', 'ai-content-factory-pro'); ?></option>
-                                            <option value="replicate"><?php echo esc_html__('🔄 Replicate', 'ai-content-factory-pro'); ?></option>
-                                            <option value="flux-pro"><?php echo esc_html__('⚡ Flux Pro', 'ai-content-factory-pro'); ?></option>
+                                            <option value="midjourney" selected><?php echo esc_html__('🎨 Midjourney - $0.05/image', 'ai-content-factory-pro'); ?></option>
+                                            <option value="sdxl-fast"><?php echo esc_html__('⚡ SDXL Fast - $0.01/image (Recommandé)', 'ai-content-factory-pro'); ?></option>
+                                            <option value="dalle"><?php echo esc_html__('🤖 DALL-E 3 - $0.04/image', 'ai-content-factory-pro'); ?></option>
+                                            <option value="sdxl"><?php echo esc_html__('🖼️ Stable Diffusion XL - $0.01/image', 'ai-content-factory-pro'); ?></option>
+                                            <option value="sdxl-food"><?php echo esc_html__('🍽️ SDXL Food LoRA - $0.02/image', 'ai-content-factory-pro'); ?></option>
+                                            <option value="flux-pro"><?php echo esc_html__('⚡ Flux Pro - $0.03/image', 'ai-content-factory-pro'); ?></option>
+                                            <option value="nanobanana"><?php echo esc_html__('🍌 Nanobanana - $0.02/image', 'ai-content-factory-pro'); ?></option>
+                                            <option value="replicate"><?php echo esc_html__('🔄 Replicate - $0.03/image', 'ai-content-factory-pro'); ?></option>
                                         </select>
                                         <p class="aicfp-hint">
                                             <?php echo esc_html__('Choisissez le moteur IA pour générer les images. SDXL Food LoRA est optimisé pour les recettes.', 'ai-content-factory-pro'); ?>
