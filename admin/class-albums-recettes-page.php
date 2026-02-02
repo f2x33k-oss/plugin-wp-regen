@@ -102,18 +102,41 @@ class AICFP_Albums_Recettes_Page {
                                     
                                     <!-- Option publication (visible seulement si texte activé) -->
                                     <div class="aicfp-form-group" id="aicfp-publish-option-row" style="display:none;">
-                                        <div class="aicfp-checkbox-group">
+                                        <label class="aicfp-label"><?php echo esc_html__('Format de publication', 'ai-content-factory-pro'); ?></label>
+                                        
+                                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                                            <!-- Format 1 : Article global -->
+                                            <label class="aicfp-radio-card" style="padding: 15px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                                                <input type="radio" name="article_format" value="global" checked style="margin-right: 10px;">
+                                                <div>
+                                                    <strong style="color: #1d2327;">📄 1 Article Global</strong>
+                                                    <p style="margin: 5px 0 0 0; font-size: 13px; color: #6b7280;">
+                                                        Toutes les recettes dans un seul article avec intro
+                                                    </p>
+                                                </div>
+                                            </label>
+                                            
+                                            <!-- Format 2 : Articles séparés -->
+                                            <label class="aicfp-radio-card" style="padding: 15px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                                                <input type="radio" name="article_format" value="individual" style="margin-right: 10px;">
+                                                <div>
+                                                    <strong style="color: #1d2327;">📚 1 Article par Recette + Tag</strong>
+                                                    <p style="margin: 5px 0 0 0; font-size: 13px; color: #6b7280;">
+                                                        Crée un tag et un article séparé pour chaque recette avec liens croisés
+                                                    </p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="aicfp-checkbox-group" style="margin-top: 15px;">
                                             <label class="aicfp-checkbox-modern">
                                                 <input type="checkbox" id="aicfp_publish_article" name="publish_article" value="1">
                                                 <span class="aicfp-checkbox-icon"></span>
                                                 <span class="aicfp-checkbox-label">
-                                                    <?php echo esc_html__('Publier l\'article directement', 'ai-content-factory-pro'); ?>
+                                                    <?php echo esc_html__('Publier directement', 'ai-content-factory-pro'); ?>
                                                 </span>
                                             </label>
                                         </div>
-                                        <p class="aicfp-hint aicfp-hint-info">
-                                            <?php echo esc_html__('L\'article contiendra : titre, intro de 30 mots, et pour chaque recette → titre + image + texte. La première image sera l\'image à la une.', 'ai-content-factory-pro'); ?>
-                                        </p>
                                     </div>
                                     
                                     <!-- Sélection API de génération d'images -->
