@@ -634,6 +634,105 @@ class AICFP_Settings_Page {
                     </div>
                 </div>
                 
+                <!-- Processus Génération Section -->
+                <div class="aicfp-card">
+                    <h2>⚙️ <?php echo esc_html__('Processus de Génération', 'ai-content-factory-pro'); ?></h2>
+                    
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label><?php echo esc_html__('Ordre de génération', 'ai-content-factory-pro'); ?></label>
+                            </th>
+                            <td>
+                                <fieldset>
+                                    <label style="display: block; margin-bottom: 10px;">
+                                        <input type="radio" name="aicfp_generation_order" value="image_first" <?php checked(get_option('aicfp_generation_order', 'image_first'), 'image_first'); ?>>
+                                        <strong>🖼️ Image d'abord, puis texte</strong>
+                                        <p class="description" style="margin: 5px 0 0 25px;">L'IA génère l'image, puis analyse l'image pour créer le texte de recette (défaut)</p>
+                                    </label>
+                                    
+                                    <label style="display: block;">
+                                        <input type="radio" name="aicfp_generation_order" value="text_first" <?php checked(get_option('aicfp_generation_order', 'image_first'), 'text_first'); ?>>
+                                        <strong>📝 Texte d'abord, puis image</strong>
+                                        <p class="description" style="margin: 5px 0 0 25px;">L'IA génère le texte de recette, puis crée une image basée sur le texte</p>
+                                    </label>
+                                </fieldset>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_stop_on_error">
+                                    <?php echo esc_html__('Arrêt si erreur', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox" 
+                                           id="aicfp_stop_on_error" 
+                                           name="aicfp_stop_on_error" 
+                                           value="1" 
+                                           <?php checked(get_option('aicfp_stop_on_error', true), true); ?>>
+                                    <?php echo esc_html__('Arrêter la génération si une erreur critique survient', 'ai-content-factory-pro'); ?>
+                                </label>
+                                <p class="description">
+                                    <?php echo esc_html__('Si désactivé, le plugin passera à la recette suivante en cas d\'erreur.', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- Prompts Personnalisables Section -->
+                <div class="aicfp-card">
+                    <h2>💬 <?php echo esc_html__('Prompts Personnalisables', 'ai-content-factory-pro'); ?></h2>
+                    <p class="description" style="margin-bottom: 15px;">
+                        <?php echo esc_html__('Modifiez les prompts utilisés pour générer les textes et images. Variables disponibles : {titre}, {item}, {ingrédients}', 'ai-content-factory-pro'); ?>
+                    </p>
+                    
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_prompt_recipe">
+                                    <?php echo esc_html__('Prompt Texte Recette', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <textarea id="aicfp_prompt_recipe" 
+                                          name="aicfp_prompt_recipe" 
+                                          rows="10" 
+                                          class="large-text code" 
+                                          style="font-family: monospace;"><?php 
+                                echo esc_textarea(get_option('aicfp_prompt_recipe', "Écris une recette à partir de : {titre}\n\nFormat:\n- Titre court\n- Personnes et temps\n- Ingrédients avec émojis et grammage\n- Étapes numérotées 1️⃣, 2️⃣ avec émojis\n- Astuce pour faciliter\n- Ingrédient à échanger\n- Astuce de cuisson\n\nSans mentionner 'comme sur la photo'"));
+                                ?></textarea>
+                                <p class="description">
+                                    <?php echo esc_html__('Prompt utilisé pour générer le texte de chaque recette. Variables : {titre}, {item}', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_prompt_image">
+                                    <?php echo esc_html__('Prompt Génération Image', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <textarea id="aicfp_prompt_image" 
+                                          name="aicfp_prompt_image" 
+                                          rows="15" 
+                                          class="large-text code" 
+                                          style="font-family: monospace;"><?php 
+                                echo esc_textarea(get_option('aicfp_prompt_image', "Tu es expert en direction artistique culinaire. Crée un prompt d'image détaillé et appétissant.\n\nConsignes:\n- Décris le rendu visuel final du plat\n- Type de plat, portions visibles\n- Ingrédients reconnaissables\n- Textures (fondant, croustillant, gratiné)\n- Couleurs dominantes\n- Type et couleur assiette\n- Disposition éléments\n- Ambiance : surface, style, éclairage naturel\n- Style : photographie culinaire professionnelle, ultra réaliste, magazine\n- Angle : trois-quarts ou dessus\n- Interdiction : personnages, mains\n\nFormat : Un prompt descriptif prêt pour générateur d'images."));
+                                ?></textarea>
+                                <p class="description">
+                                    <?php echo esc_html__('Prompt système utilisé pour créer le prompt image à partir du texte de recette. Variables : {recipe_text}', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
                 <!-- Debug Mode Section -->
                 <div class="aicfp-card" style="border: 2px solid #ff6b6b;">
                     <h2 style="color: #ff6b6b;">🔧 <?php echo esc_html__('Mode Debug', 'ai-content-factory-pro'); ?></h2>
@@ -1150,6 +1249,23 @@ class AICFP_Settings_Page {
         if (isset($_POST['aicfp_parallel_generations'])) {
             $parallel = max(1, min(10, intval($_POST['aicfp_parallel_generations'])));
             update_option('aicfp_parallel_generations', $parallel);
+        }
+        
+        // Sauvegarder ordre génération
+        if (isset($_POST['aicfp_generation_order'])) {
+            update_option('aicfp_generation_order', sanitize_text_field($_POST['aicfp_generation_order']));
+        }
+        
+        // Sauvegarder stop on error
+        update_option('aicfp_stop_on_error', isset($_POST['aicfp_stop_on_error']));
+        
+        // Sauvegarder prompts personnalisables
+        if (isset($_POST['aicfp_prompt_recipe'])) {
+            update_option('aicfp_prompt_recipe', wp_kses_post($_POST['aicfp_prompt_recipe']));
+        }
+        
+        if (isset($_POST['aicfp_prompt_image'])) {
+            update_option('aicfp_prompt_image', wp_kses_post($_POST['aicfp_prompt_image']));
         }
         
         // Sauvegarder les paramètres Google
