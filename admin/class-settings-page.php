@@ -65,10 +65,13 @@ class AICFP_Settings_Page {
                             <td>
                                 <select id="aicfp_text_engine" name="aicfp_text_engine" class="regular-text">
                                     <option value="chatgpt" <?php selected(get_option('aicfp_text_engine', 'chatgpt'), 'chatgpt'); ?>>
-                                        🤖 ChatGPT (OpenAI GPT-4o)
+                                        🤖 ChatGPT (OpenAI GPT-4o) - $0.02/recette
                                     </option>
                                     <option value="gemini" <?php selected(get_option('aicfp_text_engine', 'chatgpt'), 'gemini'); ?>>
-                                        ✨ Gemini (Google)
+                                        ✨ Gemini (Google) - Gratuit
+                                    </option>
+                                    <option value="claude" <?php selected(get_option('aicfp_text_engine', 'chatgpt'), 'claude'); ?>>
+                                        🧠 Claude (Anthropic) - $0.03/recette
                                     </option>
                                 </select>
                                 <p class="description">
@@ -113,6 +116,26 @@ class AICFP_Settings_Page {
                                 <p class="description">
                                     <?php echo esc_html__('Clé API Google Gemini Pro.', 'ai-content-factory-pro'); ?>
                                     <a href="https://makersuite.google.com/app/apikey" target="_blank"><?php echo esc_html__('Obtenir', 'ai-content-factory-pro'); ?></a>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr class="aicfp-claude-field">
+                            <th scope="row">
+                                <label for="aicfp_claude_api_key">
+                                    <?php echo esc_html__('Clé API Claude', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="password" 
+                                       id="aicfp_claude_api_key" 
+                                       name="aicfp_claude_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_claude_api_key', '')); ?>" 
+                                       class="regular-text" 
+                                       autocomplete="off">
+                                <p class="description">
+                                    <?php echo esc_html__('Clé API Anthropic Claude 3.', 'ai-content-factory-pro'); ?>
+                                    <a href="https://console.anthropic.com/" target="_blank"><?php echo esc_html__('Obtenir', 'ai-content-factory-pro'); ?></a>
                                 </p>
                             </td>
                         </tr>
@@ -1036,12 +1059,13 @@ class AICFP_Settings_Page {
             
             function toggleTextEngineFields() {
                 const engine = $('#aicfp_text_engine').val();
+                $('.aicfp-chatgpt-field, .aicfp-gemini-field, .aicfp-claude-field').hide();
                 if (engine === 'chatgpt') {
                     $('.aicfp-chatgpt-field').show();
-                    $('.aicfp-gemini-field').hide();
-                } else {
-                    $('.aicfp-chatgpt-field').hide();
+                } else if (engine === 'gemini') {
                     $('.aicfp-gemini-field').show();
+                } else if (engine === 'claude') {
+                    $('.aicfp-claude-field').show();
                 }
             }
             
@@ -1075,6 +1099,10 @@ class AICFP_Settings_Page {
         
         if (isset($_POST['aicfp_gemini_api_key'])) {
             update_option('aicfp_gemini_api_key', sanitize_text_field($_POST['aicfp_gemini_api_key']));
+        }
+        
+        if (isset($_POST['aicfp_claude_api_key'])) {
+            update_option('aicfp_claude_api_key', sanitize_text_field($_POST['aicfp_claude_api_key']));
         }
         
         if (isset($_POST['aicfp_rapidapi_key'])) {

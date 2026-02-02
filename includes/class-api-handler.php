@@ -16,13 +16,17 @@ if (!defined('ABSPATH')) {
 class AICFP_API_Handler {
     
     /**
-     * Générer du texte via OpenAI ChatGPT ou Gemini
+     * Générer du texte via ChatGPT, Gemini ou Claude
      */
     public static function generate_text($prompt, $image_url = null) {
         $text_engine = get_option('aicfp_text_engine', 'chatgpt');
         
         if ($text_engine === 'gemini') {
             return self::generate_text_with_gemini($prompt, $image_url);
+        }
+        
+        if ($text_engine === 'claude') {
+            return self::generate_text_with_claude($prompt, $image_url);
         }
         
         // ChatGPT par défaut
@@ -144,7 +148,52 @@ class AICFP_API_Handler {
             return trim($data['candidates'][0]['content']['parts'][0]['text']);
         }
         
-        return new WP_Error('gemini_error', __('Erreur avec Gemini.', 'ai-content-factory-pro'));
+        return new WP_Error('gemini_error', __('Erreur avec Gemini. Vérifiez votre clé API Gemini dans Réglages.', 'ai-content-factory-pro'));
+    }
+    
+    /**
+     * Générer du texte via Claude (Anthropic)
+     */
+    private static function generate_text_with_claude($prompt, $image_url = null) {
+        $api_key = get_option('aicfp_claude_api_key');
+        
+        if (empty($api_key)) {
+            return new WP_Error('no_api_key', __('Clé API Claude non configurée.', 'ai-content-factory-pro'));
+        }
+        
+        $full_prompt = "Tu es un chef cuisinier expert. Écris une recette à partir de : \"$prompt\".\n\n";
+        $full_prompt .= "Format: Titre, personnes, temps, ingrédients avec émojis, étapes numérotées 1️⃣, 2️⃣ avec émojis, astuces.";
+        
+        $response = wp_remote_post('https://api.anthropic.com/v1/messages', array(
+            'timeout' => 90,
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'x-api-key' => $api_key,
+                'anthropic-version' => '2023-06-01'
+            ),
+            'body' => wp_json_encode(array(
+                'model' => 'claude-3-sonnet-20240229',
+                'max_tokens' => 2000,
+                'messages' => array(
+                    array(
+                        'role' => 'user',
+                        'content' => $full_prompt
+                    )
+                )
+            ))
+        ));
+        
+        if (is_wp_error($response)) {
+            return $response;
+        }
+        
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+        
+        if (isset($data['content'][0]['text'])) {
+            return trim($data['content'][0]['text']);
+        }
+        
+        return new WP_Error('claude_error', __('Erreur avec Claude. Vérifiez votre clé API Claude dans Réglages.', 'ai-content-factory-pro'));
     }
     
     /**
