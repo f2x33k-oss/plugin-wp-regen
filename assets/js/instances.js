@@ -118,14 +118,16 @@
         
         $container.html(html);
         
-        // Scroll vers highlight si présent
-        if (highlightId) {
+        // Scroll vers highlight SEULEMENT la première fois (pas à chaque refresh)
+        if (highlightId && !sessionStorage.getItem('aicfp_scrolled_' + highlightId)) {
             setTimeout(function() {
                 const $highlighted = $('.aicfp-task-card[data-task-id="' + highlightId + '"]');
                 if ($highlighted.length) {
                     $('html, body').animate({
                         scrollTop: Math.max(0, $highlighted.offset().top - 150)
                     }, 500);
+                    // Marquer comme scrollé pour cette session
+                    sessionStorage.setItem('aicfp_scrolled_' + highlightId, 'true');
                 }
             }, 200);
         }

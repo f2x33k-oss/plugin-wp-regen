@@ -1231,6 +1231,7 @@
     transition: all 0.3s;
     position: relative;
     overflow: hidden;
+    border: 1px solid #e5e7eb;
 }
 
 .aicfp-stat-card-modern::before {
@@ -1274,8 +1275,9 @@
 .aicfp-stat-label-modern {
     font-size: 13px;
     text-transform: uppercase;
-    color: var(--aicfp-text-light);
-    font-weight: 600;
+    color: #1d2327;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
 
 /* === API SELECTOR === */
