@@ -619,6 +619,26 @@ class AICFP_Settings_Page {
                                 </p>
                             </td>
                         </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="aicfp_parallel_generations">
+                                    <?php echo esc_html__('Générations parallèles', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="number" 
+                                       id="aicfp_parallel_generations" 
+                                       name="aicfp_parallel_generations" 
+                                       value="<?php echo esc_attr(get_option('aicfp_parallel_generations', '3')); ?>" 
+                                       class="small-text"
+                                       min="1"
+                                       max="10">
+                                <p class="description">
+                                    <?php echo esc_html__('Nombre de recettes générées en parallèle (1-10). Plus élevé = plus rapide mais plus de charge serveur. Recommandé: 3', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
                     </table>
                 </div>
                 
@@ -1034,6 +1054,12 @@ class AICFP_Settings_Page {
         // Sauvegarder le mode debug
         update_option('aicfp_debug_mode_enabled', isset($_POST['aicfp_debug_mode_enabled']));
         update_option('aicfp_verbose_logging', isset($_POST['aicfp_verbose_logging']));
+        
+        // Sauvegarder le multi-threading
+        if (isset($_POST['aicfp_parallel_generations'])) {
+            $parallel = max(1, min(10, intval($_POST['aicfp_parallel_generations'])));
+            update_option('aicfp_parallel_generations', $parallel);
+        }
         
         // Sauvegarder les paramètres Google
         update_option('aicfp_use_gmail_api', isset($_POST['aicfp_use_gmail_api']));

@@ -87,7 +87,7 @@ class AICFP_Queue_Manager {
     }
     
     /**
-     * Traiter une tâche
+     * Traiter une tâche avec multi-threading
      */
     public static function process_task($task_id) {
         $task = AICFP_Database::get_task($task_id);
@@ -102,8 +102,41 @@ class AICFP_Queue_Manager {
             return;
         }
         
-        // Traiter l'item suivant
-        $item_number = $task->current_item + 1;
+        // Multi-threading: Traiter plusieurs items en parallèle
+        $parallel_limit = get_option('aicfp_parallel_generations', 3); // 3 par défaut
+        $items_to_process = min($parallel_limit, $task->total_items - $task->current_item);
+        
+        if (get_option('aicfp_verbose_logging', true)) {
+            error_log('AICFP: Traitement parallèle de ' . $items_to_process . ' items (limit: ' . $parallel_limit . ')');
+        }
+        
+        // Traiter plusieurs items en parallèle
+        for ($i = 0; $i < $items_to_process; $i++) {
+            $item_number = $task->current_item + $i + 1;
+            
+            if ($item_number > $task->total_items) {
+                break;
+            }
+            
+            // Générer en parallèle (via wp_remote_post avec timeout court)
+            self::process_single_item($task_id, $item_number);
+        }
+        
+        // Mettre à jour le current_item
+        $new_current = $task->current_item + $items_to_process;
+        $progress = round(($new_current / $task->total_items) * 100);
+        
+        AICFP_Database::update_task($task_id, array(
+            'current_item' => $new_current,
+            'progress' => $progress
+        ));
+    }
+    
+    /**
+     * Traiter un seul item
+     */
+    private static function process_single_item($task_id, $item_number) {
+        $task = AICFP_Database::get_task($task_id);
         
         // Générer le prompt pour l'item
         $prompt = self::generate_prompt($task, $item_number);
