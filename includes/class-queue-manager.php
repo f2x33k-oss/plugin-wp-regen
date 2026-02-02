@@ -458,16 +458,23 @@ class AICFP_Queue_Manager {
                     $content .= "\n";
                 }
                 
-                // Ajouter le texte de la recette
-                $content .= '<div class="recipe-content">' . wpautop($recipe_text) . '</div>';
+                // Ajouter le texte de la recette (directement sans wpautop qui peut causer des problèmes)
+                $formatted_text = nl2br(esc_html($recipe_text));
+                $content .= '<div class="recipe-content">' . $formatted_text . '</div>';
                 $content .= "\n";
                 
                 // Séparateur entre recettes
                 if ($index < count($generated_content) - 1) {
-                    $content .= '<hr class="wp-block-separator" />';
+                    $content .= '<hr class="wp-block-separator" style="margin: 30px 0;" />';
                     $content .= "\n\n";
                 }
             }
+        }
+        
+        // Logging du contenu final
+        if (get_option('aicfp_verbose_logging', true)) {
+            error_log('AICFP: Contenu final article: ' . strlen($content) . ' caractères');
+            error_log('AICFP: Contenu début: ' . substr($content, 0, 200));
         }
         
         return $content;
