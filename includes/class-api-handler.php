@@ -16,9 +16,16 @@ if (!defined('ABSPATH')) {
 class AICFP_API_Handler {
     
     /**
-     * Générer du texte via OpenAI ChatGPT
+     * Générer du texte via OpenAI ChatGPT ou Gemini
      */
     public static function generate_text($prompt, $image_url = null) {
+        $text_engine = get_option('aicfp_text_engine', 'chatgpt');
+        
+        if ($text_engine === 'gemini') {
+            return self::generate_text_with_gemini($prompt, $image_url);
+        }
+        
+        // ChatGPT par défaut
         $api_key = get_option('aicfp_openai_api_key');
         
         if (empty($api_key)) {
@@ -92,6 +99,52 @@ class AICFP_API_Handler {
         }
         
         return $data['choices'][0]['message']['content'];
+    }
+    
+    /**
+     * Générer du texte via Google Gemini
+     */
+    private static function generate_text_with_gemini($prompt, $image_url = null) {
+        $api_key = get_option('aicfp_gemini_api_key');
+        
+        if (empty($api_key)) {
+            return new WP_Error('no_api_key', __('Clé API Gemini non configurée.', 'ai-content-factory-pro'));
+        }
+        
+        // Prompt système pour Gemini
+        $full_prompt = "Tu es un chef cuisinier expert qui crée des recettes détaillées.\n\n";
+        $full_prompt .= "Ecris une recette à partir de : \"$prompt\" avec ce format:\n";
+        $full_prompt .= "- Titre court\n- Personnes et temps\n- Ingrédients avec émojis\n";
+        $full_prompt .= "- Étapes numérotées 1️⃣, 2️⃣ avec émojis\n- Astuces\n";
+        
+        $response = wp_remote_post('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $api_key, array(
+            'timeout' => 90,
+            'headers' => array(
+                'Content-Type' => 'application/json'
+            ),
+            'body' => wp_json_encode(array(
+                'contents' => array(
+                    array(
+                        'parts' => array(
+                            array('text' => $full_prompt)
+                        )
+                    )
+                )
+            ))
+        ));
+        
+        if (is_wp_error($response)) {
+            return $response;
+        }
+        
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+        
+        if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+            return trim($data['candidates'][0]['content']['parts'][0]['text']);
+        }
+        
+        return new WP_Error('gemini_error', __('Erreur avec Gemini.', 'ai-content-factory-pro'));
     }
     
     /**

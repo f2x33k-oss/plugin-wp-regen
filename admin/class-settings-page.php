@@ -58,6 +58,27 @@ class AICFP_Settings_Page {
                     <table class="form-table">
                         <tr>
                             <th scope="row">
+                                <label for="aicfp_text_engine">
+                                    <?php echo esc_html__('Moteur de génération texte', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <select id="aicfp_text_engine" name="aicfp_text_engine" class="regular-text">
+                                    <option value="chatgpt" <?php selected(get_option('aicfp_text_engine', 'chatgpt'), 'chatgpt'); ?>>
+                                        🤖 ChatGPT (OpenAI GPT-4o)
+                                    </option>
+                                    <option value="gemini" <?php selected(get_option('aicfp_text_engine', 'chatgpt'), 'gemini'); ?>>
+                                        ✨ Gemini (Google)
+                                    </option>
+                                </select>
+                                <p class="description">
+                                    <?php echo esc_html__('Choisissez le moteur IA pour générer les textes de recettes.', 'ai-content-factory-pro'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr class="aicfp-chatgpt-field">
+                            <th scope="row">
                                 <label for="aicfp_openai_api_key">
                                     <?php echo esc_html__('Clé API OpenAI', 'ai-content-factory-pro'); ?>
                                 </label>
@@ -70,8 +91,28 @@ class AICFP_Settings_Page {
                                        class="regular-text" 
                                        autocomplete="off">
                                 <p class="description">
-                                    <?php echo esc_html__('Votre clé API OpenAI pour la génération de texte (GPT-4o).', 'ai-content-factory-pro'); ?>
-                                    <a href="https://platform.openai.com/api-keys" target="_blank"><?php echo esc_html__('Obtenir une clé', 'ai-content-factory-pro'); ?></a>
+                                    <?php echo esc_html__('Clé API OpenAI pour ChatGPT GPT-4o.', 'ai-content-factory-pro'); ?>
+                                    <a href="https://platform.openai.com/api-keys" target="_blank"><?php echo esc_html__('Obtenir', 'ai-content-factory-pro'); ?></a>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr class="aicfp-gemini-field">
+                            <th scope="row">
+                                <label for="aicfp_gemini_api_key">
+                                    <?php echo esc_html__('Clé API Gemini', 'ai-content-factory-pro'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="password" 
+                                       id="aicfp_gemini_api_key" 
+                                       name="aicfp_gemini_api_key" 
+                                       value="<?php echo esc_attr(get_option('aicfp_gemini_api_key', '')); ?>" 
+                                       class="regular-text" 
+                                       autocomplete="off">
+                                <p class="description">
+                                    <?php echo esc_html__('Clé API Google Gemini Pro.', 'ai-content-factory-pro'); ?>
+                                    <a href="https://makersuite.google.com/app/apikey" target="_blank"><?php echo esc_html__('Obtenir', 'ai-content-factory-pro'); ?></a>
                                 </p>
                             </td>
                         </tr>
@@ -993,13 +1034,26 @@ class AICFP_Settings_Page {
                 }
             }
             
+            function toggleTextEngineFields() {
+                const engine = $('#aicfp_text_engine').val();
+                if (engine === 'chatgpt') {
+                    $('.aicfp-chatgpt-field').show();
+                    $('.aicfp-gemini-field').hide();
+                } else {
+                    $('.aicfp-chatgpt-field').hide();
+                    $('.aicfp-gemini-field').show();
+                }
+            }
+            
             toggleSMTPFields();
             toggleGmailFields();
             toggleDriveFields();
+            toggleTextEngineFields();
             
             $('#aicfp_smtp_enabled').on('change', toggleSMTPFields);
             $('#aicfp_use_gmail_api').on('change', toggleGmailFields);
             $('#aicfp_use_google_drive').on('change', toggleDriveFields);
+            $('#aicfp_text_engine').on('change', toggleTextEngineFields);
         });
         </script>
         <?php
@@ -1009,9 +1063,18 @@ class AICFP_Settings_Page {
      * Enregistrer les paramètres
      */
     private static function save_settings() {
+        // Sauvegarder le moteur de texte
+        if (isset($_POST['aicfp_text_engine'])) {
+            update_option('aicfp_text_engine', sanitize_text_field($_POST['aicfp_text_engine']));
+        }
+        
         // Sauvegarder les clés API
         if (isset($_POST['aicfp_openai_api_key'])) {
             update_option('aicfp_openai_api_key', sanitize_text_field($_POST['aicfp_openai_api_key']));
+        }
+        
+        if (isset($_POST['aicfp_gemini_api_key'])) {
+            update_option('aicfp_gemini_api_key', sanitize_text_field($_POST['aicfp_gemini_api_key']));
         }
         
         if (isset($_POST['aicfp_rapidapi_key'])) {
