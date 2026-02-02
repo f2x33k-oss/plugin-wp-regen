@@ -36,6 +36,7 @@ class AICFP_Ajax_Handler {
         add_action('wp_ajax_aicfp_run_tests', array($this, 'run_tests'));
         add_action('wp_ajax_aicfp_download_texts', array($this, 'download_texts'));
         add_action('wp_ajax_aicfp_download_images_zip', array($this, 'download_images_zip'));
+        add_action('wp_ajax_aicfp_pinterest_autocomplete', array($this, 'pinterest_autocomplete'));
     }
     
     /**
