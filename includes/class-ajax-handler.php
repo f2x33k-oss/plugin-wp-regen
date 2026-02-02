@@ -31,6 +31,7 @@ class AICFP_Ajax_Handler {
         add_action('wp_ajax_aicfp_calculate_estimate', array($this, 'calculate_estimate'));
         add_action('wp_ajax_aicfp_suggest_titles', array($this, 'suggest_titles'));
         add_action('wp_ajax_aicfp_search_pinterest', array($this, 'search_pinterest'));
+        add_action('wp_ajax_aicfp_search_instagram', array($this, 'search_instagram'));
         add_action('wp_ajax_aicfp_clear_logs', array($this, 'clear_logs'));
         add_action('wp_ajax_aicfp_run_tests', array($this, 'run_tests'));
     }
@@ -597,23 +598,12 @@ class AICFP_Ajax_Handler {
             error_log('AICFP: Recherche Pinterest - Query: ' . $query);
         }
         
-        // Essayer plusieurs endpoints Pinterest possibles
+        // Utiliser l'API Pinterest Unofficial (fiable)
         $endpoints = array(
-            // API Pinterest Scraper5 (recommandée)
             array(
-                'url' => 'https://pinterest-scraper5.p.rapidapi.com/api/search',
-                'host' => 'pinterest-scraper5.p.rapidapi.com',
-                'params' => array('keyword' => $query, 'limit' => 50)
-            ),
-            array(
-                'url' => 'https://pinterest-api1.p.rapidapi.com/search',
-                'host' => 'pinterest-api1.p.rapidapi.com',
-                'params' => array('q' => $query, 'limit' => 50)
-            ),
-            array(
-                'url' => 'https://pinterest-scraper.p.rapidapi.com/search',
-                'host' => 'pinterest-scraper.p.rapidapi.com',
-                'params' => array('query' => $query, 'limit' => 50)
+                'url' => 'https://unofficial-pinterest-api.p.rapidapi.com/pinterest/boards/relevance',
+                'host' => 'unofficial-pinterest-api.p.rapidapi.com',
+                'params' => array('keyword' => $query, 'num' => 50)
             )
         );
         
@@ -813,6 +803,74 @@ class AICFP_Ajax_Handler {
         }
         
         return $images;
+    }
+    
+    /**
+     * Rechercher des posts sur Instagram
+     */
+    public function search_instagram() {
+        $this->verify_request();
+        
+        $username = sanitize_text_field($_POST['username'] ?? '');
+        
+        if (empty($username)) {
+            wp_send_json_error(array(
+                'message' => __('Nom d\'utilisateur Instagram requis.', 'ai-content-factory-pro')
+            ));
+        }
+        
+        $api_key = get_option('aicfp_instagram_api_key');
+        
+        if (empty($api_key)) {
+            $api_key = '60bcbb5fe7mshd88f23d138be003p1be084jsnc1e30b0bb6d3';
+        }
+        
+        $response = wp_remote_post('https://instagram120.p.rapidapi.com/api/instagram/posts', array(
+            'timeout' => 30,
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'x-rapidapi-host' => 'instagram120.p.rapidapi.com',
+                'x-rapidapi-key' => $api_key
+            ),
+            'body' => wp_json_encode(array(
+                'username' => $username,
+                'maxId' => ''
+            ))
+        ));
+        
+        if (is_wp_error($response)) {
+            wp_send_json_error(array(
+                'message' => $response->get_error_message()
+            ));
+        }
+        
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+        
+        $images = array();
+        
+        if (isset($data['data']['posts']) && is_array($data['data']['posts'])) {
+            foreach ($data['data']['posts'] as $post) {
+                if (isset($post['image_url'])) {
+                    $images[] = array(
+                        'url' => $post['image_url'],
+                        'thumbnail' => $post['image_url'],
+                        'title' => $post['caption'] ?? '',
+                        'id' => $post['id'] ?? uniqid()
+                    );
+                }
+            }
+        }
+        
+        if (empty($images)) {
+            wp_send_json_error(array(
+                'message' => __('Aucune image trouvée pour ce compte Instagram.', 'ai-content-factory-pro')
+            ));
+        }
+        
+        wp_send_json_success(array(
+            'images' => $images,
+            'count' => count($images)
+        ));
     }
     
     /**
