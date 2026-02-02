@@ -53,6 +53,70 @@
                 performTaskAction('aicfp_delete_task', $(this).data('task-id'), 'Tâche supprimée');
             }
         });
+        
+        // Télécharger textes
+        $(document).on('click', '.aicfp-download-texts', function() {
+            const taskId = $(this).data('task-id');
+            downloadTexts(taskId);
+        });
+        
+        // Télécharger images ZIP
+        $(document).on('click', '.aicfp-download-images', function() {
+            const taskId = $(this).data('task-id');
+            downloadImagesZip(taskId);
+        });
+    }
+    
+    function downloadTexts(taskId) {
+        $.ajax({
+            url: aicfp_ajax.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'aicfp_download_texts',
+                nonce: aicfp_ajax.nonce,
+                task_id: taskId
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Créer et télécharger le fichier
+                    const blob = new Blob([response.data.content], { type: 'text/plain;charset=utf-8' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = response.data.filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    showNotification('✅ Fichier texte téléchargé', 'success');
+                } else {
+                    showNotification('❌ ' + response.data.message, 'error');
+                }
+            }
+        });
+    }
+    
+    function downloadImagesZip(taskId) {
+        showNotification('⏳ Création du ZIP en cours...', 'info');
+        
+        $.ajax({
+            url: aicfp_ajax.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'aicfp_download_images_zip',
+                nonce: aicfp_ajax.nonce,
+                task_id: taskId
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Ouvrir le lien de téléchargement
+                    window.open(response.data.url, '_blank');
+                    showNotification('✅ ZIP des images prêt !', 'success');
+                } else {
+                    showNotification('❌ ' + response.data.message, 'error');
+                }
+            }
+        });
     }
     
     function loadQueueStatus() {

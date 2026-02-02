@@ -188,6 +188,9 @@ class AICFP_Queue_Manager {
             // Générer une intro de 30 mots
             $intro = self::generate_intro($task->title);
             
+            // Sauvegarder l'intro en métadonnée pour téléchargement
+            update_post_meta($task->id, '_aicfp_intro', $intro);
+            
             // Construire le contenu avec intro + recettes
             $post_content = self::build_post_content_with_intro($intro, $generated_content, $generated_images);
             

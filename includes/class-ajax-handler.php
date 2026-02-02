@@ -34,6 +34,8 @@ class AICFP_Ajax_Handler {
         add_action('wp_ajax_aicfp_search_instagram', array($this, 'search_instagram'));
         add_action('wp_ajax_aicfp_clear_logs', array($this, 'clear_logs'));
         add_action('wp_ajax_aicfp_run_tests', array($this, 'run_tests'));
+        add_action('wp_ajax_aicfp_download_texts', array($this, 'download_texts'));
+        add_action('wp_ajax_aicfp_download_images_zip', array($this, 'download_images_zip'));
     }
     
     /**
@@ -1048,6 +1050,135 @@ class AICFP_Ajax_Handler {
         }
         
         return null; // Pas d'erreur
+    }
+    
+    /**
+     * Télécharger les textes de recettes
+     */
+    public function download_texts() {
+        $this->verify_request();
+        
+        $task_id = intval($_POST['task_id'] ?? 0);
+        
+        if (!$task_id) {
+            wp_send_json_error(array('message' => 'ID invalide'));
+        }
+        
+        $task = AICFP_Database::get_task($task_id);
+        
+        if (!$task) {
+            wp_send_json_error(array('message' => 'Tâche introuvable'));
+        }
+        
+        $generated_content = maybe_unserialize($task->generated_content);
+        
+        if (empty($generated_content)) {
+            wp_send_json_error(array('message' => 'Aucun contenu généré'));
+        }
+        
+        // Créer le fichier texte
+        $text_content = $task->title . "\n";
+        $text_content .= str_repeat("=", 60) . "\n\n";
+        
+        // Ajouter intro si disponible
+        $intro = get_post_meta($task->id, '_aicfp_intro', true);
+        if ($intro) {
+            $text_content .= "INTRODUCTION\n";
+            $text_content .= $intro . "\n\n";
+            $text_content .= str_repeat("-", 60) . "\n\n";
+        }
+        
+        // Ajouter chaque recette
+        foreach ($generated_content as $index => $item) {
+            $text_content .= "RECETTE " . ($index + 1) . "\n";
+            $text_content .= str_repeat("=", 60) . "\n\n";
+            $text_content .= $item['content'] . "\n\n";
+            $text_content .= str_repeat("-", 60) . "\n\n";
+        }
+        
+        // Retourner le contenu
+        wp_send_json_success(array(
+            'content' => $text_content,
+            'filename' => sanitize_file_name($task->title) . '.txt'
+        ));
+    }
+    
+    /**
+     * Télécharger ZIP des images
+     */
+    public function download_images_zip() {
+        $this->verify_request();
+        
+        $task_id = intval($_POST['task_id'] ?? 0);
+        
+        if (!$task_id) {
+            wp_send_json_error(array('message' => 'ID invalide'));
+        }
+        
+        $task = AICFP_Database::get_task($task_id);
+        
+        if (!$task) {
+            wp_send_json_error(array('message' => 'Tâche introuvable'));
+        }
+        
+        $generated_images = maybe_unserialize($task->generated_images);
+        $generated_content = maybe_unserialize($task->generated_content);
+        
+        if (empty($generated_images)) {
+            wp_send_json_error(array('message' => 'Aucune image générée'));
+        }
+        
+        // Créer ZIP temporaire
+        $upload_dir = wp_upload_dir();
+        $zip_filename = 'aicfp-images-' . $task_id . '-' . time() . '.zip';
+        $zip_path = $upload_dir['basedir'] . '/aicfp-temp/' . $zip_filename;
+        
+        $zip = new ZipArchive();
+        
+        if ($zip->open($zip_path, ZipArchive::CREATE) === TRUE) {
+            // Ajouter chaque image avec nom intelligent
+            foreach ($generated_images as $index => $image) {
+                // Extraire titre de la recette
+                $recipe_title = '';
+                if (isset($generated_content[$index])) {
+                    $content = $generated_content[$index]['content'];
+                    $lines = explode("\n", $content);
+                    foreach ($lines as $line) {
+                        $line = trim($line);
+                        if (!empty($line) && strlen($line) > 3) {
+                            $recipe_title = preg_replace('/^[^\w\s]+\s*/', '', $line);
+                            $recipe_title = trim(str_replace(['**', '__', '🍽️'], '', $recipe_title));
+                            if (!empty($recipe_title)) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Nom du fichier
+                $clean_title = sanitize_file_name($recipe_title);
+                $filename = ($index + 1) . '-' . substr($clean_title, 0, 50) . '.jpg';
+                
+                // Télécharger l'image
+                $image_data = file_get_contents($image['url']);
+                
+                if ($image_data) {
+                    $zip->addFromString($filename, $image_data);
+                }
+            }
+            
+            $zip->close();
+            
+            // Retourner l'URL du ZIP
+            $zip_url = $upload_dir['baseurl'] . '/aicfp-temp/' . $zip_filename;
+            
+            wp_send_json_success(array(
+                'url' => $zip_url,
+                'filename' => $zip_filename
+            ));
+        } else {
+            wp_send_json_error(array('message' => 'Erreur création ZIP'));
+        }
     }
     
     /**
