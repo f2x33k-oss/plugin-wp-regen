@@ -75,7 +75,6 @@ class AI_Content_Factory_Pro {
         require_once AICFP_PLUGIN_DIR . 'admin/class-instances-page.php';
         require_once AICFP_PLUGIN_DIR . 'admin/class-meta-box.php';
         require_once AICFP_PLUGIN_DIR . 'admin/class-debug-page.php';
-        require_once AICFP_PLUGIN_DIR . 'admin/class-tests-page.php';
         require_once AICFP_PLUGIN_DIR . 'admin/class-errors-page.php';
         
         // AJAX Handlers

@@ -87,16 +87,6 @@ class AICFP_Admin_Menu {
             array('AICFP_Settings_Page', 'render')
         );
         
-        // Sous-menu: Tests
-        add_submenu_page(
-            'aicfp-albums-recettes',
-            __('Tests Automatiques', 'ai-content-factory-pro'),
-            '<span class="dashicons dashicons-yes-alt" style="font-size: 16px; width: 16px; height: 16px; margin-right: 5px; color: #667eea;"></span>' . __('Tests', 'ai-content-factory-pro'),
-            'manage_options',
-            'aicfp-tests',
-            array('AICFP_Tests_Page', 'render')
-        );
-        
         // Sous-menu: Erreurs
         add_submenu_page(
             'aicfp-albums-recettes',
