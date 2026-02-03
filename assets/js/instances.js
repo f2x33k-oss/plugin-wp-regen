@@ -226,8 +226,12 @@
             html += '  <div class="aicfp-progress-text-modern">' + task.progress + '% complété</div>';
         }
         
-        // Détails supplémentaires
+        // Détails enrichis
         html += '  <div class="aicfp-task-details">';
+        html += '    <div class="aicfp-detail-item">';
+        html += '      <span class="aicfp-detail-label">📊 Items:</span>';
+        html += '      <span class="aicfp-detail-value">' + task.current_item + '/' + task.total_items + '</span>';
+        html += '    </div>';
         html += '    <div class="aicfp-detail-item">';
         html += '      <span class="aicfp-detail-label">💰 Coût:</span>';
         html += '      <span class="aicfp-detail-value">$' + task.cost_estimate + '</span>';
@@ -236,6 +240,18 @@
         html += '      <span class="aicfp-detail-label">⏱️ Temps:</span>';
         html += '      <span class="aicfp-detail-value">' + task.time_estimate + ' min</span>';
         html += '    </div>';
+        if (task.api_text) {
+            html += '    <div class="aicfp-detail-item">';
+            html += '      <span class="aicfp-detail-label">📝 Texte:</span>';
+            html += '      <span class="aicfp-detail-value">' + task.api_text + '</span>';
+            html += '    </div>';
+        }
+        if (task.api_images) {
+            html += '    <div class="aicfp-detail-item">';
+            html += '      <span class="aicfp-detail-label">🖼️ Images:</span>';
+            html += '      <span class="aicfp-detail-value">' + task.api_images + '</span>';
+            html += '    </div>';
+        }
         html += '    <div class="aicfp-detail-item">';
         html += '      <span class="aicfp-detail-label">📅 Créé:</span>';
         html += '      <span class="aicfp-detail-value">' + formatDate(task.created_at) + '</span>';
@@ -244,6 +260,15 @@
             html += '    <div class="aicfp-detail-item">';
             html += '      <span class="aicfp-detail-label">🚀 Démarré:</span>';
             html += '      <span class="aicfp-detail-value">' + formatDate(task.started_at) + '</span>';
+            html += '    </div>';
+        }
+        if (task.status === 'processing' && task.started_at) {
+            // Calculer temps restant
+            const elapsed = Math.floor((Date.now() - new Date(task.started_at)) / 60000);
+            const remaining = Math.max(0, task.time_estimate - elapsed);
+            html += '    <div class="aicfp-detail-item">';
+            html += '      <span class="aicfp-detail-label">⏳ Reste:</span>';
+            html += '      <span class="aicfp-detail-value">' + remaining + ' min</span>';
             html += '    </div>';
         }
         html += '  </div>';
