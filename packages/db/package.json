@@ -1,0 +1,24 @@
+{
+  "name": "@core/db",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Database client and schema",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "generate": "prisma generate",
+    "push": "prisma db push",
+    "migrate": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "migrate:reset": "prisma migrate reset",
+    "studio": "prisma studio",
+    "seed": "tsx seeds/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.9.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.9.0",
+    "tsx": "^4.7.0"
+  }
+}
