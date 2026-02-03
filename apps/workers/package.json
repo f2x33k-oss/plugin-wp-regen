@@ -1,0 +1,29 @@
+{
+  "name": "@core/workers",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Worker processes for job execution",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@core/db": "workspace:*",
+    "@core/types": "workspace:*",
+    "@core/shared": "workspace:*",
+    "@prisma/client": "^5.9.0",
+    "bullmq": "^5.1.9",
+    "redis": "^4.6.12",
+    "axios": "^1.6.5",
+    "dotenv": "^16.4.1",
+    "openai": "^4.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
