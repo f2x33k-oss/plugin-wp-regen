@@ -300,11 +300,77 @@ class AICFP_Settings_Page {
                                        class="regular-text"
                                        placeholder="Entrez votre clé API pour Flux Pro">
                                 <p class="description">
-                                    <?php echo esc_html__('Nouvelle génération, ultra-rapide (~$0.03/image, ~15s) - À configurer manuellement', 'ai-content-factory-pro'); ?>
+                                    <?php echo esc_html__('Nouvelle génération, ultra-rapide (~$0.03/image, ~15s)', 'ai-content-factory-pro'); ?>
                                 </p>
                             </td>
                         </tr>
                     </table>
+                    
+                    <div class="aicfp-api-comparison-table" style="margin-top: 20px;">
+                        <h3><?php echo esc_html__('Comparatif des moteurs', 'ai-content-factory-pro'); ?></h3>
+                        <table class="widefat" style="margin-top: 10px;">
+                            <thead>
+                                <tr>
+                                    <th><?php echo esc_html__('Moteur', 'ai-content-factory-pro'); ?></th>
+                                    <th><?php echo esc_html__('Coût/image', 'ai-content-factory-pro'); ?></th>
+                                    <th><?php echo esc_html__('Temps', 'ai-content-factory-pro'); ?></th>
+                                    <th><?php echo esc_html__('Qualité', 'ai-content-factory-pro'); ?></th>
+                                    <th><?php echo esc_html__('Spécialité', 'ai-content-factory-pro'); ?></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: #e7f5e7;">
+                                    <td style="padding: 12px;"><strong>SDXL Lightning 4-Step</strong> ⚡</td>
+                                    <td style="padding: 12px; color: #00a32a; font-weight: 700;">$0.005</td>
+                                    <td style="padding: 12px;">~5s</td>
+                                    <td style="padding: 12px;">⭐⭐⭐⭐</td>
+                                    <td style="padding: 12px;">Ultra-rapide</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px;"><strong>SDXL Fast</strong></td>
+                                    <td style="padding: 12px; color: #00a32a; font-weight: 600;">$0.01</td>
+                                    <td style="padding: 12px;">~20s</td>
+                                    <td style="padding: 12px;">⭐⭐⭐⭐</td>
+                                    <td style="padding: 12px;">Économique</td>
+                                </tr>
+                                <tr style="background: #fff7e6;">
+                                    <td style="padding: 12px;"><strong>SDXL Food LoRA</strong> ⭐</td>
+                                    <td style="padding: 12px; color: #00a32a; font-weight: 600;">$0.02</td>
+                                    <td style="padding: 12px;">~45s</td>
+                                    <td style="padding: 12px;">⭐⭐⭐⭐⭐</td>
+                                    <td style="padding: 12px;">Recettes</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px;"><strong>DALL-E 3</strong></td>
+                                    <td style="padding: 12px; color: #dba617;">$0.04</td>
+                                    <td style="padding: 12px;">~20s</td>
+                                    <td style="padding: 12px;">⭐⭐⭐⭐⭐</td>
+                                    <td style="padding: 12px;">Premium</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px;"><strong>Midjourney</strong></td>
+                                    <td style="padding: 12px; color: #d63638;">$0.05</td>
+                                    <td style="padding: 12px;">~2 min</td>
+                                    <td style="padding: 12px;">⭐⭐⭐⭐⭐</td>
+                                    <td style="padding: 12px;">Artistique</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p style="margin-top: 15px; padding: 12px; background: #e7f5e7; border-left: 4px solid #00a32a; border-radius: 4px;">
+                            <strong style="color: #006700;">💡 Recommandation</strong> : 
+                            <span style="color: #1d2327;">Utilisez <strong>SDXL Lightning</strong> (le plus rapide et économique) ou <strong>SDXL Food LoRA</strong> (spécialisé recettes)</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Replicate API Section -->
+                <div class="aicfp-card">
+                    <h2><?php echo esc_html__('Replicate (Pour SDXL Lightning)', 'ai-content-factory-pro'); ?></h2>
+                    <p class="description">
+                        <?php echo esc_html__('SDXL Lightning nécessite un compte Replicate séparé. Très économique et ultra-rapide !', 'ai-content-factory-pro'); ?>
+                    </p>
+                    
+                    <table class="form-table">
                     
                     <div class="aicfp-api-comparison-table" style="margin-top: 20px;">
                         <h3><?php echo esc_html__('Comparatif des moteurs', 'ai-content-factory-pro'); ?></h3>

@@ -154,11 +154,12 @@ class AICFP_Albums_Recettes_Page {
                                             <?php echo esc_html__('Moteur de génération d\'images', 'ai-content-factory-pro'); ?>
                                         </label>
                                         <select id="aicfp_image_api" name="image_api" class="aicfp-input aicfp-api-selector">
-                                            <option value="midjourney" selected><?php echo esc_html__('🎨 Midjourney - $0.05/image', 'ai-content-factory-pro'); ?></option>
-                                            <option value="sdxl-fast"><?php echo esc_html__('⚡ SDXL Fast - $0.01/image (Recommandé)', 'ai-content-factory-pro'); ?></option>
+                                            <option value="sdxl-lightning"><?php echo esc_html__('⚡ SDXL Lightning 4-Step - $0.005/image (Le + rapide) ⭐', 'ai-content-factory-pro'); ?></option>
+                                            <option value="sdxl-fast"><?php echo esc_html__('⚡ SDXL Fast - $0.01/image', 'ai-content-factory-pro'); ?></option>
+                                            <option value="sdxl-food"><?php echo esc_html__('🍽️ SDXL Food LoRA - $0.02/image (Recommandé recettes)', 'ai-content-factory-pro'); ?></option>
+                                            <option value="midjourney"><?php echo esc_html__('🎨 Midjourney - $0.05/image', 'ai-content-factory-pro'); ?></option>
                                             <option value="dalle"><?php echo esc_html__('🤖 DALL-E 3 - $0.04/image', 'ai-content-factory-pro'); ?></option>
-                                            <option value="sdxl"><?php echo esc_html__('🖼️ Stable Diffusion XL - $0.01/image', 'ai-content-factory-pro'); ?></option>
-                                            <option value="sdxl-food"><?php echo esc_html__('🍽️ SDXL Food LoRA - $0.02/image', 'ai-content-factory-pro'); ?></option>
+                                            <option value="sdxl"><?php echo esc_html__('🖼️ SDXL - $0.01/image', 'ai-content-factory-pro'); ?></option>
                                             <option value="flux-pro"><?php echo esc_html__('⚡ Flux Pro - $0.03/image', 'ai-content-factory-pro'); ?></option>
                                             <option value="nanobanana"><?php echo esc_html__('🍌 Nanobanana - $0.02/image', 'ai-content-factory-pro'); ?></option>
                                             <option value="replicate"><?php echo esc_html__('🔄 Replicate - $0.03/image', 'ai-content-factory-pro'); ?></option>
