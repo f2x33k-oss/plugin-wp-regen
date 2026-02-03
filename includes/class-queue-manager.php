@@ -141,10 +141,34 @@ class AICFP_Queue_Manager {
         // Générer le prompt pour l'item
         $prompt = self::generate_prompt($task, $item_number);
         
-        // ÉTAPE 1: Générer l'image via l'API sélectionnée EN PREMIER
+        // Récupérer l'ordre de génération depuis les réglages
+        $generation_order = get_option('aicfp_generation_order', 'image_first');
         $reference_images = maybe_unserialize($task->reference_images);
         $image_api = get_post_meta($task->id, '_aicfp_image_api', true) ?: 'midjourney';
-        $image_url = AICFP_Image_API_Manager::generate_image($prompt, $image_api, $reference_images);
+        
+        $content = '';
+        $image_url = null;
+        
+        if ($generation_order === 'text_first') {
+            // TEXTE D'ABORD, puis image basée sur le texte
+            if ($task->generate_text) {
+                $content = AICFP_API_Handler::generate_text($prompt, null);
+                if (is_wp_error($content)) {
+                    self::log_error($task_id, sprintf(
+                        __('Erreur génération texte item %d: %s', 'ai-content-factory-pro'),
+                        $item_number,
+                        $content->get_error_message()
+                    ));
+                    $content = '';
+                } else {
+                    // Créer prompt image basé sur le texte
+                    $image_prompt = self::create_image_prompt_from_recipe($content);
+                    $image_url = AICFP_Image_API_Manager::generate_image($image_prompt, $image_api, $reference_images);
+                }
+            }
+        } else {
+            // IMAGE D'ABORD (défaut), puis texte basé sur l'image
+            $image_url = AICFP_Image_API_Manager::generate_image($prompt, $image_api, $reference_images);
         
         if (is_wp_error($image_url)) {
             $error_msg = sprintf(
