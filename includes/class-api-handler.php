@@ -220,8 +220,8 @@ class AICFP_API_Handler {
             $full_prompt .= ' --sref ' . $ref_urls;
         }
         
-        // API Midjourney Best Experience
-        $api_url = 'https://midjourney-best-experience.p.rapidapi.com/mj/imagine';
+        // API Midjourney Best Experience (endpoint mis à jour)
+        $api_url = 'https://midjourney-best-experience.p.rapidapi.com/api/imagine';
         
         // Envoyer la requête POST pour créer la tâche
         $response = wp_remote_post($api_url, array(
