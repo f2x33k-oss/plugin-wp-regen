@@ -37,6 +37,9 @@ class AICFP_Image_API_Manager {
             case 'replicate':
                 return self::generate_with_replicate($prompt, $reference_images);
             
+            case 'sdxl-lightning':
+                return self::generate_with_sdxl_lightning($prompt, $reference_images);
+            
             case 'flux-pro':
                 return self::generate_with_flux_pro($prompt, $reference_images);
             
@@ -416,12 +419,54 @@ class AICFP_Image_API_Manager {
     }
     
     /**
+     * SDXL Lightning 4-Step (Replicate - Ultra rapide)
+     */
+    private static function generate_with_sdxl_lightning($prompt, $reference_images = null) {
+        $api_key = get_option('aicfp_replicate_api_key');
+        
+        if (empty($api_key)) {
+            return new WP_Error('no_api_key', __('Clé API Replicate non configurée.', 'ai-content-factory-pro'));
+        }
+        
+        $response = wp_remote_post('https://api.replicate.com/v1/predictions', array(
+            'timeout' => 60,
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Token ' . $api_key
+            ),
+            'body' => wp_json_encode(array(
+                'version' => 'bytedance/sdxl-lightning-4step',
+                'input' => array(
+                    'prompt' => $prompt,
+                    'num_outputs' => 1,
+                    'width' => 1024,
+                    'height' => 1024
+                )
+            ))
+        ));
+        
+        if (is_wp_error($response)) {
+            return $response;
+        }
+        
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+        
+        if (isset($data['id'])) {
+            return self::poll_replicate($data['id'], $api_key);
+        }
+        
+        return new WP_Error('sdxl_lightning_error', __('Erreur avec SDXL Lightning.', 'ai-content-factory-pro'));
+    }
+    
+    /**
      * Obtenir le coût par image selon l'API
      */
     public static function get_cost_per_image($api_type) {
         $costs = array(
             'midjourney' => 0.05,
             'sdxl' => 0.01,
+            'sdxl-fast' => 0.01,
+            'sdxl-lightning' => 0.005,
             'sdxl-food' => 0.02,
             'sdxl-finetuned' => 0.02,
             'dalle' => 0.04,

@@ -330,6 +330,14 @@
     function performTaskAction(action, taskId, successMessage) {
         successMessage = successMessage || 'Action effectuée';
         
+        // Griser la card pendant le traitement
+        const $card = $('.aicfp-task-card[data-task-id="' + taskId + '"]');
+        $card.css({
+            'opacity': '0.5',
+            'pointer-events': 'none',
+            'filter': 'grayscale(50%)'
+        });
+        
         // Afficher une notification de chargement
         const $loader = $('<div class="aicfp-notification aicfp-notification-info">⏳ Traitement en cours...</div>');
         $('body').append($loader);
@@ -346,6 +354,13 @@
             success: function(response) {
                 $loader.fadeOut(200, function() { $(this).remove(); });
                 
+                // Restaurer la card
+                $card.css({
+                    'opacity': '1',
+                    'pointer-events': 'auto',
+                    'filter': 'none'
+                });
+                
                 if (response.success) {
                     loadQueueStatus();
                     showNotification('✅ ' + successMessage, 'success');
@@ -355,6 +370,14 @@
             },
             error: function() {
                 $loader.fadeOut(200, function() { $(this).remove(); });
+                
+                // Restaurer la card
+                $card.css({
+                    'opacity': '1',
+                    'pointer-events': 'auto',
+                    'filter': 'none'
+                });
+                
                 showNotification('❌ Une erreur est survenue', 'error');
             }
         });
